@@ -27,10 +27,10 @@ pygmentsStyle = "dracula"
     url = "/posts/"
     
     # You can add extra information before the name (HTML format is supported), such as icons
-    pre = ""
+    #pre = ""
 
     # You can add extra information after the name (HTML format is supported), such as icons
-    post = ""
+    #post = ""
 
     # Display name
     name = "Posts"
@@ -55,7 +55,7 @@ pygmentsStyle = "dracula"
     identifier = "contact"
     url = "mailto:saulomastelini@gmail.com"
     name = "Contact me"
-    weight = 4
+    weight = 5
 
   [[menu.main]]
     identifier = "tags"
