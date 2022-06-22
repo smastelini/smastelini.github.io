@@ -1,10 +1,9 @@
 baseURL = "http://smastelini.github.io/"
 defaultContentLanguage = "en"
 languageCode = "en"
-
 title = "Saulo Martiello Mastelini"
-
 theme = "gokarna"
+encoding = "UTF-8"
 
 # Emoji support
 enableEmoji = true
