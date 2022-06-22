@@ -1,0 +1,56 @@
+<header class="header">
+    <nav class="header-nav">
+
+        {{ if isset .Site.Params "avatarurl" }}
+        <div class="avatar">
+            <a href="{{ .Site.BaseURL }}">
+                <img src="{{ .Site.BaseURL }}{{ .Site.Params.AvatarURL }}" alt="avatar" />
+            </a>
+        </div>
+        {{ end }}
+
+        <div class="nav-title">
+            <a class="nav-brand" href="{{ .Site.BaseURL }}">{{ .Site.Title }}</a>
+        </div>
+
+        <div class="nav-links">
+            {{ range .Site.Menus.main }}
+            <div class="nav-link">
+                <a href="{{ .URL | absURL }}">
+                    {{- .Pre | safeHTML }} {{ .Name }} {{ .Post | safeHTML -}}
+                </a>
+            </div>
+            {{ end }}
+
+            <span class="nav-icons-divider"></span>
+            <div class="nav-link dark-theme-toggle">
+                <a>
+                    <span id="theme-toggle-icon" data-feather="moon"></span>
+                </a>
+            </div>
+
+            <div class="nav-link" id="hamburger-menu-toggle">
+                <a>
+                    <span data-feather="menu"></span>
+                </a>
+            </div>
+
+            <!-- For mobile -->
+            <ul class="nav-hamburger-list visibility-hidden">
+                {{ range .Site.Menus.main }}
+                <li class="nav-item">
+                    <a href="{{ .URL | absURL }}">
+                        {{- .Pre | safeHTML }} {{ .Name }} {{ .Post | safeHTML -}}
+                    </a>
+                </li>
+                {{ end }}
+                <li class="nav-item dark-theme-toggle">
+                    <a>
+                        <span id="theme-toggle-icon" data-feather="moon"></span>
+                    </a>
+                </li>
+            </ul>
+
+        </div>
+    </nav>
+</header>

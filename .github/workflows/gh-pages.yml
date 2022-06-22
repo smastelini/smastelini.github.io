@@ -1,5 +1,7 @@
 name: github pages
 
+encoding: UTF-8
+
 on:
   push:
     branches:

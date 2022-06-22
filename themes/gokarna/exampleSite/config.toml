@@ -1,0 +1,77 @@
+baseURL = "https://gokarna-hugo.netlify.app"
+title = "Gokarna"
+theme = "gokarna"
+languageCode = "en"
+defaultContentLanguage = "en"
+enableEmoji = true
+enableRobotsTXT = true
+
+# Choose one of emacs, trac or perldoc
+pygmentsStyle = "monokai"
+
+[params]
+  footer = "The Marauders"
+  description = "Sky above, sand below and peace within"
+  avatarURL = "/images/avatar.webp"
+  avatarSize = "size-m"
+  customHeadHTML = """
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.16/dist/katex.min.css" integrity="sha384-6LkG2wmY8FK9E0vU9OOr8UvLwsaqUg9SETfpq4uTCN1agNe8HRdE9ABlk+fVx6gZ" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.16/dist/katex.min.js" integrity="sha384-31El76TwmbHj4rF9DyLsygbq6xoIobG0W+jqXim+a3dU9W53tdH3A/ngRPxOzzaB" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.16/dist/contrib/auto-render.min.js" integrity="sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl" crossorigin="anonymous"
+        onload="renderMathInElement(document.body);"></script>
+  """
+  socialIcons = [
+    {name = "twitter", url = "https://example.com"},
+    {name = "linkedin", url = "https://example.com"},
+    {name = "stackoverflow", url = "https://example.com"},
+    {name = "dribbble", url = "https://example.com"},
+    {name = "instagram", url = "https://example.com"},
+    {name = "twitch", url = "https://example.com"},
+  ]
+  metaKeywords = ["blog", "gokarna", "hugo"]
+
+[menu]
+  [[menu.main]]
+    name = "Home"
+    url = "/"
+    weight = 1
+
+  [[menu.main]]
+    name = "Posts"
+    url = "/posts/"
+    weight = 2
+
+  [[menu.main]]
+    name = "Projects"
+    url = "/projects/"
+    weight = 3
+
+  [[menu.main]]
+    name = "Tags"
+    url = "/tags/"
+    weight = 4
+
+  [[menu.main]]
+    identifier = "github"
+    pre = "<span data-feather='github'></span>"
+    url = "https://github.com/526avijitgupta/gokarna"
+    weight = 5
+
+  [[menu.main]]
+    identifier = "buymeacoffee"
+    pre = "<span data-feather='coffee'></span>"
+    url = "https://www.buymeacoffee.com/avijitgupta"
+    weight = 6
+
+  [[menu.main]]
+    identifier = "rss"
+    pre = "<span data-feather='rss'></span>"
+    url = "/index.xml"
+    weight = 7
+
+[markup]
+  [markup.tableOfContents]
+    startLevel = 1
+    endLevel = 4
+    ordered = false
