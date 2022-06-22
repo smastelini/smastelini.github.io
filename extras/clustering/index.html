@@ -1,0 +1,1013 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{--accent-color:#FF4D4D}</style><title>Aula 8 - Aprendizado de Máquina - Tutoria - Clustering particional</title><meta name=description content="Countryside boy dabbling in the world of online machine learning"><meta name=keywords content="blog,river-ml,machine-learning,online-machine-learning,regression"><meta property="og:url" content="http://smastelini.github.io/extras/clustering/"><meta property="og:type" content="website"><meta property="og:title" content="Aula 8 - Aprendizado de Máquina - Tutoria - Clustering particional"><meta property="og:description" content="Countryside boy dabbling in the world of online machine learning"><meta property="og:image" content="images/avatar.jpg"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="Aula 8 - Aprendizado de Máquina - Tutoria - Clustering particional"><meta name=twitter:description content="Countryside boy dabbling in the world of online machine learning"><meta property="twitter:domain" content="http://smastelini.github.io/extras/clustering/"><meta property="twitter:url" content="http://smastelini.github.io/extras/clustering/"><meta name=twitter:image content="images/avatar.jpg"><link rel=canonical href=http://smastelini.github.io/extras/clustering/><link rel=stylesheet type=text/css href=http://smastelini.github.io//css/normalize.min.css media=print onload='this.media="all"'><link rel=stylesheet type=text/css href=http://smastelini.github.io//css/main.css><link disabled id=dark-theme rel=stylesheet href=http://smastelini.github.io//css/dark.css><script src=http://smastelini.github.io//js/svg-injector.min.js></script>
+<script src=http://smastelini.github.io//js/feather-icons.min.js></script>
+<script src=http://smastelini.github.io//js/main.js></script>
+<link rel=apple-touch-icon sizes=180x180 href=apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=favicon-16x16.png><link rel=manifest href=site.webmanifest></head><body><script type=text/javascript>setThemeByUserPref()</script><header class=header><nav class=header-nav><div class=avatar><a href=http://smastelini.github.io/><img src=http://smastelini.github.io/images/avatar.jpg alt=avatar></a></div><div class=nav-title><a class=nav-brand href=http://smastelini.github.io/>Saulo Martiello Mastelini</a></div><div class=nav-links><div class=nav-link><a href=http://smastelini.github.io/about/>About</a></div><div class=nav-link><a href=http://smastelini.github.io/posts/>Posts</a></div><div class=nav-link><a href=http://smastelini.github.io/links/>Links</a></div><div class=nav-link><a href=mailto:saulomastelini@gmail.com>Contact me</a></div><div class=nav-link><a href=http://smastelini.github.io/pdf/cv-mastelini.pdf>CV</a></div><div class=nav-link><a href=http://smastelini.github.io/tags/>Tags</a></div><div class=nav-link><a href=https://github.com/smastelini/><span data-feather=github></span></a></div><div class=nav-link><a href=https://www.linkedin.com/in/smastelini/><span data-feather=linkedin></span></a></div><span class=nav-icons-divider></span><div class="nav-link dark-theme-toggle"><a><span id=theme-toggle-icon data-feather=moon></span></a></div><div class=nav-link id=hamburger-menu-toggle><a><span data-feather=menu></span></a></div><ul class="nav-hamburger-list visibility-hidden"><li class=nav-item><a href=http://smastelini.github.io/about/>About</a></li><li class=nav-item><a href=http://smastelini.github.io/posts/>Posts</a></li><li class=nav-item><a href=http://smastelini.github.io/links/>Links</a></li><li class=nav-item><a href=mailto:saulomastelini@gmail.com>Contact me</a></li><li class=nav-item><a href=http://smastelini.github.io/pdf/cv-mastelini.pdf>CV</a></li><li class=nav-item><a href=http://smastelini.github.io/tags/>Tags</a></li><li class=nav-item><a href=https://github.com/smastelini/><span data-feather=github></span></a></li><li class=nav-item><a href=https://www.linkedin.com/in/smastelini/><span data-feather=linkedin></span></a></li><li class="nav-item dark-theme-toggle"><a><span id=theme-toggle-icon data-feather=moon></span></a></li></ul></div></nav></header><main id=content><div class="post container"><div class=post-header-section><h1>Aula 8 - Aprendizado de Máquina - Tutoria - Clustering particional</h1></div><div class=post-content><p><p>Saulo Martiello Mastelini (<a href=mailto:mastelini@usp.br>mastelini@usp.br</a>)
+Outras redes: <a href=https://github.com/smastelini>Github</a> - <a href=https://www.linkedin.com/in/smastelini/>Linkedin</a></p><p>MBA em Ciência de Dados
+Universidade de São Paulo, São Carlos, Brasil
+Copyright (c) 2020</p><hr><p><strong>Disclaimer:</strong> Eu gerei um arquivo de markdown para essa postagem. Nesse notebook eu utilizo plots interativos para melhor entender o funcionamento dos algoritmos. Sugiro fazer o download do notebook original <a href="https://colab.research.google.com/drive/1PAAdciCzMr7htXaEH4fmnINlcy6Mo3C_?usp=sharing">aqui</a> e o executar localmente 😄</p><hr><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>import</span> time
+</span></span><span style=display:flex><span><span style=color:#ff79c6>import</span> numpy <span style=color:#ff79c6>as</span> np
+</span></span><span style=display:flex><span><span style=color:#ff79c6>import</span> matplotlib.pyplot <span style=color:#ff79c6>as</span> plt
+</span></span><span style=display:flex><span><span style=color:#ff79c6>import</span> matplotlib
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib inline
+</span></span></code></pre></div><h1 id=plano>Plano</h1><p>Nessa prática abordaremos basicamente dois algoritmos para clustering particional, que se baseiam em diferentes estratégias:</p><ul><li>Protótipo<ol><li>k-Means</li><li>k-Medians</li><li>Partitioning Around Medoids (PAM) ou k-Medoids</li></ol></li><li>Densidade
+3. DBSCAN</li></ul><h2 id=lembrete>Lembrete:</h2><p>Apesar de alguns algoritmos de agrupamento oferecerem uma função <code>predict</code>, estamos falando de um paradigma descritivo de aprendizado, como apresentado em aula. É importante sempre nos lembrarmos das diferenças desse tipo de atividade em relação à tarefas de predição (aprendizado supervisionado).</p><h1 id=1-clustering-particional-protótipos>1. Clustering Particional: protótipos</h1><h2 id=11-k-meanshttpsscikit-learnorgstablemodulesclusteringhtmlk-means>1.1. <a href=https://scikit-learn.org/stable/modules/clustering.html#k-means>k-Means</a></h2><p>O k-Means busca separar os dados em grupos de igual variância. Para tal, o k-Means minimiza um critério conhecido como <em>Inertia</em> (inércia) ou <em>Within-cluster sum-of-squares</em>. É o equivalente a miminizar a distância euclidiana ao quadrado de cada ponto para o seu centróide ou, ainda, a variância intra-cluster (<a href=https://stats.stackexchange.com/questions/158210/k-means-why-minimizing-wcss-is-maximizing-distance-between-clusters>leitura interessante</a>). A inércia mede quão coerentes os clusters são internamente. No entanto, temos alguns problemas com essa abordagem:</p><ul><li>A inércia assume que os clusters são convexos e isotrópicos (seus raios são iguais), o que nem sempre é verdade.</li><li>A inércia não é uma métrica com <em>range</em> bem definido: apenas sabemos que quanto menor, melhor e, que zero é o valor mínimo possível. Em espaços com muitas dimensões, o uso da distância euclidiana pode nos levar a problemas devido à um <a href=https://stats.stackexchange.com/questions/99171/why-is-euclidean-distance-not-a-good-metric-in-high-dimensions>caso específico</a> da <a href=https://builtin.com/data-science/curse-dimensionality>tão dita maldição da dimensionalidade</a>. Nesse caso, vale a pena utilizar um algoritmo para redução de dimensões, como a Análise de Componentes Principais (PCA), antes do k-Means (de bônus, reduzimos o tempo de computação).</li></ul><p>Começarei definindo uma implementação simples desse algoritmo e depois avaliaremos o passo-a-passo de sua implementação.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>class</span> <span style=color:#50fa7b>KMeans</span>:
+</span></span><span style=display:flex><span>    <span style=color:#ff79c6>def</span> __init__(self, k, etol<span style=color:#ff79c6>=</span><span style=color:#bd93f9>1e-3</span>, max_iter<span style=color:#ff79c6>=</span><span style=color:#bd93f9>100</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>42</span>):
+</span></span><span style=display:flex><span>        self<span style=color:#ff79c6>.</span>k <span style=color:#ff79c6>=</span> k
+</span></span><span style=display:flex><span>        self<span style=color:#ff79c6>.</span>etol <span style=color:#ff79c6>=</span> etol
+</span></span><span style=display:flex><span>        self<span style=color:#ff79c6>.</span>max_iter <span style=color:#ff79c6>=</span> max_iter
+</span></span><span style=display:flex><span>        self<span style=color:#ff79c6>.</span>random_state <span style=color:#ff79c6>=</span> random_state
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#6272a4># Define semente de geração aleatória</span>
+</span></span><span style=display:flex><span>        np<span style=color:#ff79c6>.</span>random<span style=color:#ff79c6>.</span>seed(self<span style=color:#ff79c6>.</span>random_state)
+</span></span><span style=display:flex><span>        <span style=color:#6272a4># Variáveis internas</span>
+</span></span><span style=display:flex><span>        self<span style=color:#ff79c6>.</span>cluster_centers_ <span style=color:#ff79c6>=</span> <span style=color:#ff79c6>None</span>
+</span></span><span style=display:flex><span>        self<span style=color:#ff79c6>.</span>n_iter_ <span style=color:#ff79c6>=</span> <span style=color:#bd93f9>0</span>  <span style=color:#6272a4># Número de iterações</span>
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#ff79c6>def</span> <span style=color:#50fa7b>_clustering_criterion</span>(self, X, cluster_center):
+</span></span><span style=display:flex><span>        <span style=color:#6272a4># Within cluster sum-of-squares</span>
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>return</span> np<span style=color:#ff79c6>.</span>sum((X <span style=color:#ff79c6>-</span> cluster_center) <span style=color:#ff79c6>**</span> <span style=color:#bd93f9>2</span>, axis<span style=color:#ff79c6>=</span><span style=color:#bd93f9>1</span>)
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#ff79c6>def</span> <span style=color:#50fa7b>_pick_centers</span>(self, X, verbose<span style=color:#ff79c6>=</span><span style=color:#ff79c6>False</span>):
+</span></span><span style=display:flex><span>        <span style=color:#6272a4># Vou selecionar aleatoriamente k linhas dos meus dados para serem</span>
+</span></span><span style=display:flex><span>        <span style=color:#6272a4># os centros iniciais</span>
+</span></span><span style=display:flex><span>        sel_rows <span style=color:#ff79c6>=</span> np<span style=color:#ff79c6>.</span>random<span style=color:#ff79c6>.</span>choice(X<span style=color:#ff79c6>.</span>shape[<span style=color:#bd93f9>0</span>], size<span style=color:#ff79c6>=</span>self<span style=color:#ff79c6>.</span>k, replace<span style=color:#ff79c6>=</span><span style=color:#ff79c6>False</span>)
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>if</span> verbose:
+</span></span><span style=display:flex><span>            <span style=color:#8be9fd;font-style:italic>print</span>(<span style=color:#f1fa8c>&#39;</span><span style=color:#f1fa8c>\n</span><span style=color:#f1fa8c>Linhas selecionadas como centros dos clusters:&#39;</span>, sel_rows)
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        self<span style=color:#ff79c6>.</span>cluster_centers_ <span style=color:#ff79c6>=</span> np<span style=color:#ff79c6>.</span>zeros((self<span style=color:#ff79c6>.</span>k, X<span style=color:#ff79c6>.</span>shape[<span style=color:#bd93f9>1</span>]))
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#6272a4># Note que o &#34;label&#34; que cada centro recebe depende na seleção inicial</span>
+</span></span><span style=display:flex><span>        <span style=color:#6272a4># (não existe uma noção de ordem aqui)</span>
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>for</span> cluster_id, row <span style=color:#ff79c6>in</span> <span style=color:#8be9fd;font-style:italic>enumerate</span>(sel_rows):
+</span></span><span style=display:flex><span>            self<span style=color:#ff79c6>.</span>cluster_centers_[cluster_id] <span style=color:#ff79c6>=</span> X[row]
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>if</span> verbose:
+</span></span><span style=display:flex><span>            <span style=color:#8be9fd;font-style:italic>print</span>(<span style=color:#f1fa8c>&#39;Centros selecionados:&#39;</span>)
+</span></span><span style=display:flex><span>            <span style=color:#ff79c6>for</span> center_id, center <span style=color:#ff79c6>in</span> <span style=color:#8be9fd;font-style:italic>enumerate</span>(self<span style=color:#ff79c6>.</span>cluster_centers_):
+</span></span><span style=display:flex><span>                <span style=color:#8be9fd;font-style:italic>print</span>(<span style=color:#f1fa8c>f</span><span style=color:#f1fa8c>&#39;</span><span style=color:#f1fa8c>{</span>center_id<span style=color:#f1fa8c>}</span><span style=color:#f1fa8c>: </span><span style=color:#f1fa8c>{</span>center<span style=color:#f1fa8c>}</span><span style=color:#f1fa8c>&#39;</span>)
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#ff79c6>def</span> <span style=color:#50fa7b>_update_centers</span>(self, X, verbose<span style=color:#ff79c6>=</span><span style=color:#ff79c6>False</span>):
+</span></span><span style=display:flex><span>        scores <span style=color:#ff79c6>=</span> self<span style=color:#ff79c6>.</span>predict(X)
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        new_centers <span style=color:#ff79c6>=</span> np<span style=color:#ff79c6>.</span>zeros_like(self<span style=color:#ff79c6>.</span>cluster_centers_)
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>for</span> center_id <span style=color:#ff79c6>in</span> <span style=color:#8be9fd;font-style:italic>range</span>(self<span style=color:#ff79c6>.</span>k):
+</span></span><span style=display:flex><span>            new_centers[center_id] <span style=color:#ff79c6>=</span> np<span style=color:#ff79c6>.</span>mean(X[scores <span style=color:#ff79c6>==</span> center_id], axis<span style=color:#ff79c6>=</span><span style=color:#bd93f9>0</span>)
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>if</span> verbose:
+</span></span><span style=display:flex><span>            <span style=color:#8be9fd;font-style:italic>print</span>(<span style=color:#f1fa8c>&#39;</span><span style=color:#f1fa8c>\n</span><span style=color:#f1fa8c>Mudança dos centros:&#39;</span>)
+</span></span><span style=display:flex><span>            <span style=color:#ff79c6>for</span> center_id <span style=color:#ff79c6>in</span> <span style=color:#8be9fd;font-style:italic>range</span>(self<span style=color:#ff79c6>.</span>k):
+</span></span><span style=display:flex><span>                <span style=color:#8be9fd;font-style:italic>print</span>(<span style=color:#f1fa8c>f</span><span style=color:#f1fa8c>&#39;</span><span style=color:#f1fa8c>{</span>center_id<span style=color:#f1fa8c>}</span><span style=color:#f1fa8c>: </span><span style=color:#f1fa8c>{</span>self<span style=color:#ff79c6>.</span>cluster_centers_[center_id]<span style=color:#f1fa8c>}</span><span style=color:#f1fa8c> -&gt; </span><span style=color:#f1fa8c>{</span>new_centers[center_id]<span style=color:#f1fa8c>}</span><span style=color:#f1fa8c>&#39;</span>)
+</span></span><span style=display:flex><span>                
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>return</span> new_centers
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#ff79c6>def</span> <span style=color:#50fa7b>_stop_criteria_convergence</span>(self, new_centers, verbose<span style=color:#ff79c6>=</span><span style=color:#ff79c6>False</span>):
+</span></span><span style=display:flex><span>        diff <span style=color:#ff79c6>=</span> np<span style=color:#ff79c6>.</span>sum((self<span style=color:#ff79c6>.</span>cluster_centers_ <span style=color:#ff79c6>-</span> new_centers) <span style=color:#ff79c6>**</span> <span style=color:#bd93f9>2</span>)
+</span></span><span style=display:flex><span>        check <span style=color:#ff79c6>=</span> diff <span style=color:#ff79c6>&lt;</span> self<span style=color:#ff79c6>.</span>etol
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>if</span> verbose:
+</span></span><span style=display:flex><span>            <span style=color:#8be9fd;font-style:italic>print</span>(<span style=color:#f1fa8c>f</span><span style=color:#f1fa8c>&#39;Variação dos centros: </span><span style=color:#f1fa8c>{</span>diff<span style=color:#f1fa8c>}</span><span style=color:#f1fa8c>&#39;</span>)
+</span></span><span style=display:flex><span>            <span style=color:#ff79c6>if</span> check:
+</span></span><span style=display:flex><span>                <span style=color:#8be9fd;font-style:italic>print</span>(<span style=color:#f1fa8c>f</span><span style=color:#f1fa8c>&#39;</span><span style=color:#f1fa8c>\n</span><span style=color:#f1fa8c>Variação dos centros é menor que &#34;etol&#34;: </span><span style=color:#f1fa8c>{</span>diff<span style=color:#f1fa8c>}</span><span style=color:#f1fa8c>. Parando.&#39;</span>)
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>return</span> check
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#ff79c6>def</span> <span style=color:#50fa7b>_stop_criteria_max_iter</span>(self, verbose<span style=color:#ff79c6>=</span><span style=color:#ff79c6>False</span>):
+</span></span><span style=display:flex><span>        check <span style=color:#ff79c6>=</span> self<span style=color:#ff79c6>.</span>n_iter_ <span style=color:#ff79c6>&gt;=</span> self<span style=color:#ff79c6>.</span>max_iter
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>if</span> verbose:
+</span></span><span style=display:flex><span>            <span style=color:#8be9fd;font-style:italic>print</span>(<span style=color:#f1fa8c>f</span><span style=color:#f1fa8c>&#39;Iteração </span><span style=color:#f1fa8c>{</span>self<span style=color:#ff79c6>.</span>n_iter_<span style=color:#f1fa8c>}</span><span style=color:#f1fa8c>&#39;</span>)
+</span></span><span style=display:flex><span>            <span style=color:#ff79c6>if</span> check:
+</span></span><span style=display:flex><span>                <span style=color:#8be9fd;font-style:italic>print</span>(<span style=color:#f1fa8c>f</span><span style=color:#f1fa8c>&#39;</span><span style=color:#f1fa8c>\n</span><span style=color:#f1fa8c>Número máximo de iterações atingido: </span><span style=color:#f1fa8c>{</span>self<span style=color:#ff79c6>.</span>n_iter_<span style=color:#f1fa8c>}</span><span style=color:#f1fa8c>. Parando.&#39;</span>)
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>return</span> check
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#ff79c6>def</span> <span style=color:#50fa7b>fit</span>(self, X, verbose<span style=color:#ff79c6>=</span><span style=color:#ff79c6>False</span>, cycle_callback<span style=color:#ff79c6>=</span><span style=color:#ff79c6>None</span>):
+</span></span><span style=display:flex><span>        <span style=color:#6272a4># Inicializa os centros</span>
+</span></span><span style=display:flex><span>        self<span style=color:#ff79c6>.</span>_pick_centers(X, verbose<span style=color:#ff79c6>=</span>verbose)
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        p_out <span style=color:#ff79c6>=</span> <span style=color:#ff79c6>None</span>
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>while</span> <span style=color:#ff79c6>True</span>:  <span style=color:#6272a4># Loop infinito. Os critérios de parada definirão o fim dos ciclos</span>
+</span></span><span style=display:flex><span>            new_centers <span style=color:#ff79c6>=</span> self<span style=color:#ff79c6>.</span>_update_centers(X, verbose<span style=color:#ff79c6>=</span>verbose)
+</span></span><span style=display:flex><span>            
+</span></span><span style=display:flex><span>            <span style=color:#6272a4># Pequeno acochambramento</span>
+</span></span><span style=display:flex><span>            <span style=color:#ff79c6>if</span> cycle_callback <span style=color:#ff79c6>is</span> <span style=color:#ff79c6>not</span> <span style=color:#ff79c6>None</span>:
+</span></span><span style=display:flex><span>                p_out <span style=color:#ff79c6>=</span> cycle_callback(X, self<span style=color:#ff79c6>.</span>predict(X), new_centers, fig<span style=color:#ff79c6>=</span>p_out)
+</span></span><span style=display:flex><span>            
+</span></span><span style=display:flex><span>            <span style=color:#ff79c6>if</span> self<span style=color:#ff79c6>.</span>_stop_criteria_convergence(new_centers, verbose<span style=color:#ff79c6>=</span>verbose):
+</span></span><span style=display:flex><span>                <span style=color:#ff79c6>break</span>
+</span></span><span style=display:flex><span>            
+</span></span><span style=display:flex><span>            self<span style=color:#ff79c6>.</span>cluster_centers_ <span style=color:#ff79c6>=</span> new_centers
+</span></span><span style=display:flex><span>            
+</span></span><span style=display:flex><span>            <span style=color:#6272a4># Pequeno acochambramento</span>
+</span></span><span style=display:flex><span>            <span style=color:#ff79c6>if</span> cycle_callback <span style=color:#ff79c6>is</span> <span style=color:#ff79c6>not</span> <span style=color:#ff79c6>None</span>:
+</span></span><span style=display:flex><span>                p_out <span style=color:#ff79c6>=</span> cycle_callback(X, self<span style=color:#ff79c6>.</span>predict(X), self<span style=color:#ff79c6>.</span>cluster_centers_, fig<span style=color:#ff79c6>=</span>p_out)
+</span></span><span style=display:flex><span>            
+</span></span><span style=display:flex><span>            <span style=color:#6272a4># Atualiza o número de iterações</span>
+</span></span><span style=display:flex><span>            self<span style=color:#ff79c6>.</span>n_iter_ <span style=color:#ff79c6>+=</span> <span style=color:#bd93f9>1</span>
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>            <span style=color:#ff79c6>if</span> self<span style=color:#ff79c6>.</span>_stop_criteria_max_iter(verbose<span style=color:#ff79c6>=</span>verbose):
+</span></span><span style=display:flex><span>                <span style=color:#ff79c6>break</span>
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>return</span> self
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#ff79c6>def</span> <span style=color:#50fa7b>predict</span>(self, X, verbose<span style=color:#ff79c6>=</span><span style=color:#ff79c6>False</span>):
+</span></span><span style=display:flex><span>        <span style=color:#6272a4># Matriz com n_instances x n_clusters</span>
+</span></span><span style=display:flex><span>        errors <span style=color:#ff79c6>=</span> np<span style=color:#ff79c6>.</span>zeros((X<span style=color:#ff79c6>.</span>shape[<span style=color:#bd93f9>0</span>], self<span style=color:#ff79c6>.</span>k))
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>for</span> center_id, center <span style=color:#ff79c6>in</span> <span style=color:#8be9fd;font-style:italic>enumerate</span>(self<span style=color:#ff79c6>.</span>cluster_centers_):
+</span></span><span style=display:flex><span>            errors[:, center_id] <span style=color:#ff79c6>=</span> self<span style=color:#ff79c6>.</span>_clustering_criterion(X, center)
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>if</span> verbose:
+</span></span><span style=display:flex><span>            <span style=color:#8be9fd;font-style:italic>print</span>(errors)
+</span></span><span style=display:flex><span>            
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>return</span> np<span style=color:#ff79c6>.</span>argmin(errors, axis<span style=color:#ff79c6>=</span><span style=color:#bd93f9>1</span>)
+</span></span><span style=display:flex><span>        
+</span></span></code></pre></div><h6 id=agora-vamos-aos-poucos-entender-o-papel-de-cada-parte>Agora vamos aos poucos entender o papel de cada parte</h6><h3 id=111-a-iniciar-pela-seleção-dos-centros>1.1.1. A iniciar pela seleção dos centros</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#6272a4># Vou gerar uma matriz de numeros aleatórios</span>
+</span></span><span style=display:flex><span>np<span style=color:#ff79c6>.</span>random<span style=color:#ff79c6>.</span>seed(<span style=color:#bd93f9>7</span>)
+</span></span><span style=display:flex><span>X_toy <span style=color:#ff79c6>=</span> np<span style=color:#ff79c6>.</span>random<span style=color:#ff79c6>.</span>uniform(size<span style=color:#ff79c6>=</span>(<span style=color:#bd93f9>20</span>, <span style=color:#bd93f9>2</span>))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#8be9fd;font-style:italic>print</span>(<span style=color:#f1fa8c>&#39;Dados:&#39;</span>)
+</span></span><span style=display:flex><span><span style=color:#8be9fd;font-style:italic>print</span>(X_toy)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>kmeans <span style=color:#ff79c6>=</span> KMeans(k<span style=color:#ff79c6>=</span><span style=color:#bd93f9>3</span>)
+</span></span><span style=display:flex><span>kmeans<span style=color:#ff79c6>.</span>_pick_centers(X_toy, verbose<span style=color:#ff79c6>=</span><span style=color:#ff79c6>True</span>)
+</span></span></code></pre></div><pre><code>Dados:
+[[0.07630829 0.77991879]
+ [0.43840923 0.72346518]
+ [0.97798951 0.53849587]
+ [0.50112046 0.07205113]
+ [0.26843898 0.4998825 ]
+ [0.67923    0.80373904]
+ [0.38094113 0.06593635]
+ [0.2881456  0.90959353]
+ [0.21338535 0.45212396]
+ [0.93120602 0.02489923]
+ [0.60054892 0.9501295 ]
+ [0.23030288 0.54848992]
+ [0.90912837 0.13316945]
+ [0.52341258 0.75040986]
+ [0.66901324 0.46775286]
+ [0.20484909 0.49076589]
+ [0.37238469 0.47740115]
+ [0.36589039 0.83791799]
+ [0.76864751 0.31399468]
+ [0.57262533 0.27604905]]
+
+Linhas selecionadas como centros dos clusters: [ 0 17 15]
+Centros selecionados:
+0: [0.07630829 0.77991879]
+1: [0.36589039 0.83791799]
+2: [0.20484909 0.49076589]
+</code></pre><p><strong>Como sempre, vou definir uma função simples de plot para não ficar repetindo código sem necessidade</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>def</span> <span style=color:#50fa7b>plot_cluster</span>(X, labels<span style=color:#ff79c6>=</span><span style=color:#ff79c6>None</span>, centers<span style=color:#ff79c6>=</span><span style=color:#ff79c6>None</span>, fig<span style=color:#ff79c6>=</span><span style=color:#ff79c6>None</span>):
+</span></span><span style=display:flex><span>    <span style=color:#6272a4># Figura começando do zero</span>
+</span></span><span style=display:flex><span>    <span style=color:#ff79c6>if</span> fig <span style=color:#ff79c6>is</span> <span style=color:#ff79c6>None</span>:
+</span></span><span style=display:flex><span>        dims <span style=color:#ff79c6>=</span> (<span style=color:#bd93f9>3</span>, <span style=color:#bd93f9>3</span>)  <span style=color:#6272a4># Sem legenda</span>
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>if</span> labels <span style=color:#ff79c6>is</span> <span style=color:#ff79c6>not</span> <span style=color:#ff79c6>None</span>:
+</span></span><span style=display:flex><span>            <span style=color:#ff79c6>if</span> centers <span style=color:#ff79c6>is</span> <span style=color:#ff79c6>None</span>:
+</span></span><span style=display:flex><span>                dims <span style=color:#ff79c6>=</span> (<span style=color:#bd93f9>4</span>, <span style=color:#bd93f9>3</span>)  <span style=color:#6272a4># Sem centros</span>
+</span></span><span style=display:flex><span>            <span style=color:#ff79c6>else</span>:
+</span></span><span style=display:flex><span>                dims <span style=color:#ff79c6>=</span> (<span style=color:#bd93f9>5</span>, <span style=color:#bd93f9>3</span>)  <span style=color:#6272a4># Com centros</span>
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        fig, ax <span style=color:#ff79c6>=</span> plt<span style=color:#ff79c6>.</span>subplots(figsize<span style=color:#ff79c6>=</span>dims)
+</span></span><span style=display:flex><span>    <span style=color:#ff79c6>else</span>:  <span style=color:#6272a4># Reciclando figura anterior</span>
+</span></span><span style=display:flex><span>        ax <span style=color:#ff79c6>=</span> fig<span style=color:#ff79c6>.</span>axes[<span style=color:#bd93f9>0</span>]
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#ff79c6>if</span> labels <span style=color:#ff79c6>is</span> <span style=color:#ff79c6>None</span>:
+</span></span><span style=display:flex><span>        ax<span style=color:#ff79c6>.</span>scatter(X[:, <span style=color:#bd93f9>0</span>], X[:, <span style=color:#bd93f9>1</span>])
+</span></span><span style=display:flex><span>    <span style=color:#ff79c6>else</span>:
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>for</span> center <span style=color:#ff79c6>in</span> np<span style=color:#ff79c6>.</span>unique(labels):
+</span></span><span style=display:flex><span>            imask <span style=color:#ff79c6>=</span> labels <span style=color:#ff79c6>==</span> center
+</span></span><span style=display:flex><span>            ax<span style=color:#ff79c6>.</span>scatter(X[imask, <span style=color:#bd93f9>0</span>], X[imask, <span style=color:#bd93f9>1</span>], label<span style=color:#ff79c6>=</span>center)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>if</span> centers <span style=color:#ff79c6>is</span> <span style=color:#ff79c6>not</span> <span style=color:#ff79c6>None</span>:
+</span></span><span style=display:flex><span>            ax<span style=color:#ff79c6>.</span>scatter(centers[:, <span style=color:#bd93f9>0</span>], centers[:, <span style=color:#bd93f9>1</span>], marker<span style=color:#ff79c6>=</span><span style=color:#f1fa8c>&#39;+&#39;</span>, c<span style=color:#ff79c6>=</span><span style=color:#f1fa8c>&#39;black&#39;</span>,
+</span></span><span style=display:flex><span>                       label<span style=color:#ff79c6>=</span><span style=color:#f1fa8c>&#39;center&#39;</span>, s<span style=color:#ff79c6>=</span><span style=color:#bd93f9>200</span>)
+</span></span><span style=display:flex><span>        ax<span style=color:#ff79c6>.</span>legend(loc<span style=color:#ff79c6>=</span><span style=color:#f1fa8c>&#39;upper left&#39;</span>, bbox_to_anchor<span style=color:#ff79c6>=</span>(<span style=color:#bd93f9>1.05</span>, <span style=color:#bd93f9>1</span>))
+</span></span><span style=display:flex><span>    plt<span style=color:#ff79c6>.</span>tight_layout()
+</span></span><span style=display:flex><span>    plt<span style=color:#ff79c6>.</span>close()
+</span></span><span style=display:flex><span>    <span style=color:#ff79c6>return</span> fig
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>plot_cluster(X_toy)
+</span></span></code></pre></div><p><img src=output_8_0.png alt=png></p><h3 id=112-função-predict>1.1.2. Função predict</h3><p>Notem que a as linhas escolhidas como centros iniciais tem inércia zero.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>scores <span style=color:#ff79c6>=</span> kmeans<span style=color:#ff79c6>.</span>predict(X_toy, verbose<span style=color:#ff79c6>=</span><span style=color:#ff79c6>True</span>)
+</span></span><span style=display:flex><span><span style=color:#8be9fd;font-style:italic>print</span>(<span style=color:#f1fa8c>&#39;</span><span style=color:#f1fa8c>\n</span><span style=color:#f1fa8c>Scores:&#39;</span>, scores)
+</span></span></code></pre></div><pre><code>[[0.         0.0872217  0.10013214]
+ [0.1343041  0.01835843 0.1086993 ]
+ [0.87131405 0.46431895 0.60002426]
+ [0.68154201 0.60483922 0.26309877]
+ [0.11533453 0.12376477 0.00412679]
+ [0.36408199 0.09934991 0.32298943]
+ [0.6025721  0.59618219 0.21148855]
+ [0.06169058 0.01118163 0.1823549 ]
+ [0.12623957 0.17209482 0.00156607]
+ [1.30090467 0.98058128 0.74462614]
+ [0.30379992 0.06765605 0.36759328]
+ [0.07727366 0.10215258 0.00397996]
+ [1.11187401 0.79177803 0.62388453]
+ [0.20077302 0.03247092 0.16889769]
+ [0.44874673 0.22890569 0.21597796]
+ [0.10013214 0.14644888 0.        ]
+ [0.17917816 0.13001457 0.02824679]
+ [0.0872217  0.         0.14644888]
+ [0.69641887 0.43670894 0.34911672]
+ [0.50021533 0.35843605 0.18136269]]
+
+Scores: [0 1 1 2 2 1 2 1 2 2 1 2 2 1 2 2 2 1 2 2]
+</code></pre><p>Sem visualizar os centroides</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>plot_cluster(X_toy, scores)
+</span></span></code></pre></div><p><img src=output_12_0.png alt=png></p><p>Com os centroides</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>plot_cluster(X_toy, scores, kmeans<span style=color:#ff79c6>.</span>cluster_centers_)
+</span></span></code></pre></div><p><img src=output_14_0.png alt=png></p><h3 id=113-por-fim-vamos-testar-a-função-que-atualiza-os-centroides>1.1.3. Por fim, vamos testar a função que atualiza os centroides</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>new_centroids <span style=color:#ff79c6>=</span> kmeans<span style=color:#ff79c6>.</span>_update_centers(X_toy, verbose<span style=color:#ff79c6>=</span><span style=color:#ff79c6>True</span>)
+</span></span></code></pre></div><pre><code>Mudança dos centros:
+0: [0.07630829 0.77991879] -&gt; [0.07630829 0.77991879]
+1: [0.36589039 0.83791799] -&gt; [0.55337517 0.78767871]
+2: [0.20484909 0.49076589] -&gt; [0.50183692 0.31854301]
+</code></pre><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>plot_cluster(X_toy, scores, new_centroids)
+</span></span></code></pre></div><p><img src=output_17_0.png alt=png></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#6272a4># Vou forçar a troca dos centroides</span>
+</span></span><span style=display:flex><span>kmeans<span style=color:#ff79c6>.</span>cluster_centers_ <span style=color:#ff79c6>=</span> new_centroids
+</span></span><span style=display:flex><span>scores <span style=color:#ff79c6>=</span> kmeans<span style=color:#ff79c6>.</span>predict(X_toy)
+</span></span><span style=display:flex><span><span style=color:#8be9fd;font-style:italic>print</span>(<span style=color:#f1fa8c>&#39;</span><span style=color:#f1fa8c>\n</span><span style=color:#f1fa8c>Scores:&#39;</span>, scores)
+</span></span></code></pre></div><pre><code>Scores: [0 1 1 2 2 1 2 0 2 2 1 0 2 1 2 0 2 1 2 2]
+</code></pre><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>plot_cluster(X_toy, scores, kmeans<span style=color:#ff79c6>.</span>cluster_centers_)
+</span></span></code></pre></div><p><img src=output_19_0.png alt=png></p><h3 id=114-vamos-avaliar-nossos-critérios-de-parada>1.1.4. Vamos avaliar nossos critérios de parada</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>kmeans<span style=color:#ff79c6>.</span>n_iter_ <span style=color:#ff79c6>+=</span> <span style=color:#bd93f9>1</span>
+</span></span><span style=display:flex><span><span style=color:#6272a4># Iterações (iteramos apenas uma vez)</span>
+</span></span><span style=display:flex><span>kmeans<span style=color:#ff79c6>.</span>_stop_criteria_max_iter(verbose<span style=color:#ff79c6>=</span><span style=color:#ff79c6>True</span>)
+</span></span></code></pre></div><pre><code>Iteração 1
+
+
+
+
+
+False
+</code></pre><h5 id=lets-try-again-mais-uma-iteração>Let&rsquo;s try again: mais uma iteração</h5><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>new_centroids <span style=color:#ff79c6>=</span> kmeans<span style=color:#ff79c6>.</span>_update_centers(X_toy, verbose<span style=color:#ff79c6>=</span><span style=color:#ff79c6>True</span>)
+</span></span></code></pre></div><pre><code>Mudança dos centros:
+0: [0.07630829 0.77991879] -&gt; [0.19990146 0.68219203]
+1: [0.55337517 0.78767871] -&gt; [0.5975801  0.76735957]
+2: [0.50183692 0.31854301] -&gt; [0.55868911 0.27832604]
+</code></pre><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>kmeans<span style=color:#ff79c6>.</span>n_iter_ <span style=color:#ff79c6>+=</span> <span style=color:#bd93f9>1</span>
+</span></span><span style=display:flex><span><span style=color:#6272a4># Iterações (iteramos duas vezes)</span>
+</span></span><span style=display:flex><span>kmeans<span style=color:#ff79c6>.</span>_stop_criteria_max_iter(verbose<span style=color:#ff79c6>=</span><span style=color:#ff79c6>True</span>)
+</span></span></code></pre></div><pre><code>Iteração 2
+
+
+
+
+
+False
+</code></pre><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#6272a4># Convergência</span>
+</span></span><span style=display:flex><span>kmeans<span style=color:#ff79c6>.</span>_stop_criteria_convergence(new_centroids, verbose<span style=color:#ff79c6>=</span><span style=color:#ff79c6>True</span>)
+</span></span></code></pre></div><pre><code>Variação dos centros: 0.03204231220845901
+
+
+
+
+
+False
+</code></pre><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#6272a4># Vou atualizar mais uma vez os centroides de forma manual</span>
+</span></span><span style=display:flex><span>kmeans<span style=color:#ff79c6>.</span>cluster_centers_ <span style=color:#ff79c6>=</span> new_centroids
+</span></span><span style=display:flex><span>scores <span style=color:#ff79c6>=</span> kmeans<span style=color:#ff79c6>.</span>predict(X_toy)
+</span></span><span style=display:flex><span><span style=color:#8be9fd;font-style:italic>print</span>(<span style=color:#f1fa8c>&#39;</span><span style=color:#f1fa8c>\n</span><span style=color:#f1fa8c>Scores:&#39;</span>, scores)
+</span></span></code></pre></div><pre><code>Scores: [0 1 1 2 0 1 2 0 0 2 1 0 2 1 2 0 0 0 2 2]
+</code></pre><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>plot_cluster(X_toy, scores, kmeans<span style=color:#ff79c6>.</span>cluster_centers_)
+</span></span></code></pre></div><p><img src=output_27_0.png alt=png></p><p>E assim por diante&mldr;</p><h5 id=e-se-mudarmos-a-inicialização>E se mudarmos a inicialização?</h5><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>kmeans <span style=color:#ff79c6>=</span> KMeans(k<span style=color:#ff79c6>=</span><span style=color:#bd93f9>3</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>0</span>)
+</span></span><span style=display:flex><span>kmeans<span style=color:#ff79c6>.</span>_pick_centers(X_toy, verbose<span style=color:#ff79c6>=</span><span style=color:#ff79c6>True</span>)
+</span></span><span style=display:flex><span>scores <span style=color:#ff79c6>=</span> kmeans<span style=color:#ff79c6>.</span>predict(X_toy)
+</span></span><span style=display:flex><span><span style=color:#8be9fd;font-style:italic>print</span>(<span style=color:#f1fa8c>&#39;</span><span style=color:#f1fa8c>\n</span><span style=color:#f1fa8c>Scores:&#39;</span>, scores)
+</span></span></code></pre></div><pre><code>Linhas selecionadas como centros dos clusters: [18  1 19]
+Centros selecionados:
+0: [0.76864751 0.31399468]
+1: [0.43840923 0.72346518]
+2: [0.57262533 0.27604905]
+
+Scores: [1 1 0 2 1 1 2 1 1 0 1 1 0 1 0 1 1 1 0 2]
+</code></pre><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>plot_cluster(X_toy, scores, kmeans<span style=color:#ff79c6>.</span>cluster_centers_)
+</span></span></code></pre></div><p><img src=output_30_0.png alt=png></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>new_centroids <span style=color:#ff79c6>=</span> kmeans<span style=color:#ff79c6>.</span>_update_centers(X_toy, verbose<span style=color:#ff79c6>=</span><span style=color:#ff79c6>True</span>)
+</span></span><span style=display:flex><span>kmeans<span style=color:#ff79c6>.</span>cluster_centers_ <span style=color:#ff79c6>=</span> new_centroids
+</span></span><span style=display:flex><span>scores <span style=color:#ff79c6>=</span> kmeans<span style=color:#ff79c6>.</span>predict(X_toy)
+</span></span><span style=display:flex><span><span style=color:#8be9fd;font-style:italic>print</span>(<span style=color:#f1fa8c>&#39;</span><span style=color:#f1fa8c>\n</span><span style=color:#f1fa8c>Scores:&#39;</span>, scores)
+</span></span></code></pre></div><pre><code>Mudança dos centros:
+0: [0.76864751 0.31399468] -&gt; [0.85119693 0.29566242]
+1: [0.43840923 0.72346518] -&gt; [0.35510883 0.68531978]
+2: [0.57262533 0.27604905] -&gt; [0.48489564 0.13801218]
+
+Scores: [1 1 0 2 1 1 2 1 1 0 1 1 0 1 0 1 1 1 0 2]
+</code></pre><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>plot_cluster(X_toy, scores, kmeans<span style=color:#ff79c6>.</span>cluster_centers_)
+</span></span></code></pre></div><p><img src=output_32_0.png alt=png></p><p>A inicialização faz toda a diferença. A literatura nos traz formas mais &ldquo;espertas&rdquo; de se inicializar os clusters. Por exemplo, esse <a href=http://ilpubs.stanford.edu:8090/778/1/2006-13.pdf>artigo</a> é uma boa referência no assunto e sua proposta é implementada no sklearn.</p><h3 id=115-estamos-com-o-queijo-a-faca-e-a-goiabada-na-mão-para-entender-o-nosso-método-fit>1.1.5. Estamos com o queijo, a faca, e a goiabada na mão para entender o nosso método <code>fit</code>.</h3><p>Agora é só usar:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>kmeans <span style=color:#ff79c6>=</span> KMeans(k<span style=color:#ff79c6>=</span><span style=color:#bd93f9>3</span>)
+</span></span><span style=display:flex><span>kmeans<span style=color:#ff79c6>.</span>fit(X_toy, verbose<span style=color:#ff79c6>=</span><span style=color:#ff79c6>True</span>)
+</span></span></code></pre></div><pre><code>Linhas selecionadas como centros dos clusters: [ 0 17 15]
+Centros selecionados:
+0: [0.07630829 0.77991879]
+1: [0.36589039 0.83791799]
+2: [0.20484909 0.49076589]
+
+Mudança dos centros:
+0: [0.07630829 0.77991879] -&gt; [0.07630829 0.77991879]
+1: [0.36589039 0.83791799] -&gt; [0.55337517 0.78767871]
+2: [0.20484909 0.49076589] -&gt; [0.50183692 0.31854301]
+Variação dos centros: 0.1555370227867891
+Iteração 1
+
+Mudança dos centros:
+0: [0.07630829 0.77991879] -&gt; [0.19990146 0.68219203]
+1: [0.55337517 0.78767871] -&gt; [0.5975801  0.76735957]
+2: [0.50183692 0.31854301] -&gt; [0.55868911 0.27832604]
+Variação dos centros: 0.03204231220845901
+Iteração 2
+
+Mudança dos centros:
+0: [0.19990146 0.68219203] -&gt; [0.25246316 0.62451172]
+1: [0.5975801  0.76735957] -&gt; [0.64391805 0.75324789]
+2: [0.55868911 0.27832604] -&gt; [0.67609744 0.19340753]
+Variação dos centros: 0.029431962695117678
+Iteração 3
+
+Mudança dos centros:
+0: [0.25246316 0.62451172] -&gt; [0.25246316 0.62451172]
+1: [0.64391805 0.75324789] -&gt; [0.64391805 0.75324789]
+2: [0.67609744 0.19340753] -&gt; [0.67609744 0.19340753]
+Variação dos centros: 0.0
+
+Variação dos centros é menor que &quot;etol&quot;: 0.0. Parando.
+
+
+
+
+
+&lt;__main__.KMeans at 0x7fbd04936c70&gt;
+</code></pre><h3 id=116-tem-algo-misterioso-faltando-nesse-código>1.1.6. Tem algo misterioso faltando nesse código</h3><p>E aquele parâmetro <code>cycle_callback</code>?</p><p>Eu deixei esse parâmetro sendo chamado em dois momentos:</p><ul><li>Quando novos centróides são definidos</li><li>Quando eles são atualizados</li></ul><p><code>cycle_callback</code> é chamado como uma função&mldr; porque eu passarei uma função como parãmetro.</p><p>Ideia: vamos visualizar o que está acontecendo na nossa implementação, passo-a-passo. Para tal, vou aproveitar aquela função de plot que eu havia definido anteriormente.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>def</span> <span style=color:#50fa7b>plot_callback_factory</span>(delay<span style=color:#ff79c6>=</span><span style=color:#bd93f9>0.2</span>):
+</span></span><span style=display:flex><span>    <span style=color:#6272a4># Recicla plots para simular animações</span>
+</span></span><span style=display:flex><span>    <span style=color:#ff79c6>def</span> <span style=color:#50fa7b>plot_at_each_cycle</span>(X, scores, centroids, fig<span style=color:#ff79c6>=</span><span style=color:#ff79c6>None</span>, delay<span style=color:#ff79c6>=</span>delay):
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>if</span> fig <span style=color:#ff79c6>is</span> <span style=color:#ff79c6>not</span> <span style=color:#ff79c6>None</span>:
+</span></span><span style=display:flex><span>            fig<span style=color:#ff79c6>.</span>axes[<span style=color:#bd93f9>0</span>]<span style=color:#ff79c6>.</span>clear()
+</span></span><span style=display:flex><span>        <span style=color:#6272a4># Chama a nossa função de plot</span>
+</span></span><span style=display:flex><span>        fig <span style=color:#ff79c6>=</span> plot_cluster(X, scores, centroids, fig)
+</span></span><span style=display:flex><span>        <span style=color:#6272a4># Exibe os resultados</span>
+</span></span><span style=display:flex><span>        fig<span style=color:#ff79c6>.</span>show()
+</span></span><span style=display:flex><span>        fig<span style=color:#ff79c6>.</span>canvas<span style=color:#ff79c6>.</span>draw()
+</span></span><span style=display:flex><span>        time<span style=color:#ff79c6>.</span>sleep(delay)
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>return</span> fig
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#ff79c6>return</span> plot_at_each_cycle
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#6272a4># Habilitarei plots interativos e desabilitarei a captura interativa dos plots</span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib notebook
+</span></span><span style=display:flex><span>plt<span style=color:#ff79c6>.</span>ioff()
+</span></span></code></pre></div><p>Resultado:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#6272a4># Plots com delay de meio segundo entre atualizações</span>
+</span></span><span style=display:flex><span>callback <span style=color:#ff79c6>=</span> plot_callback_factory(<span style=color:#bd93f9>0.5</span>)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>kmeans <span style=color:#ff79c6>=</span> KMeans(k<span style=color:#ff79c6>=</span><span style=color:#bd93f9>3</span>)
+</span></span><span style=display:flex><span>kmeans<span style=color:#ff79c6>.</span>fit(X_toy, cycle_callback<span style=color:#ff79c6>=</span>callback)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib inline
+</span></span></code></pre></div><pre><code>&lt;IPython.core.display.Javascript object&gt;
+</code></pre><p>Voltaremos a esse tipo de plot novamente :D</p><h2 id=12-variante-k-medians>1.2. (variante) k-Medians</h2><p>Enquanto o k-Means utiliza a média dos pontos como protótipo dos clusters. Outra alternativa é utilizar a mediana como o &ldquo;centro&rdquo; de cada cluster. Isso tem o efeito de minimizar a norma Manhattan (1-norm), ao invés do quadrado da norma Euclidiana (2-norm), como no k-Means. Vamos aproveitar a nossa implementação do k-Means e mudar apenas o necessário:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>class</span> <span style=color:#50fa7b>KMedians</span>(KMeans):
+</span></span><span style=display:flex><span>    <span style=color:#ff79c6>def</span> <span style=color:#50fa7b>_clustering_criterion</span>(self, X, center):
+</span></span><span style=display:flex><span>        <span style=color:#6272a4># Taxicab norm or Manhattan norm (1-norm)</span>
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>return</span> np<span style=color:#ff79c6>.</span>sum(np<span style=color:#ff79c6>.</span>abs(X <span style=color:#ff79c6>-</span> center), axis<span style=color:#ff79c6>=</span><span style=color:#bd93f9>1</span>)
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#ff79c6>def</span> <span style=color:#50fa7b>_update_centers</span>(self, X, verbose<span style=color:#ff79c6>=</span><span style=color:#ff79c6>False</span>):
+</span></span><span style=display:flex><span>        scores <span style=color:#ff79c6>=</span> self<span style=color:#ff79c6>.</span>predict(X)
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        new_centers <span style=color:#ff79c6>=</span> np<span style=color:#ff79c6>.</span>zeros_like(self<span style=color:#ff79c6>.</span>cluster_centers_)
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>for</span> center_id <span style=color:#ff79c6>in</span> <span style=color:#8be9fd;font-style:italic>range</span>(self<span style=color:#ff79c6>.</span>k):
+</span></span><span style=display:flex><span>            <span style=color:#6272a4># Aqui está a mudança!</span>
+</span></span><span style=display:flex><span>            new_centers[center_id] <span style=color:#ff79c6>=</span> np<span style=color:#ff79c6>.</span>median(X[scores <span style=color:#ff79c6>==</span> center_id], axis<span style=color:#ff79c6>=</span><span style=color:#bd93f9>0</span>)
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>if</span> verbose:
+</span></span><span style=display:flex><span>            <span style=color:#8be9fd;font-style:italic>print</span>(<span style=color:#f1fa8c>&#39;</span><span style=color:#f1fa8c>\n</span><span style=color:#f1fa8c>Mudança dos centros:&#39;</span>)
+</span></span><span style=display:flex><span>            <span style=color:#ff79c6>for</span> center_id <span style=color:#ff79c6>in</span> <span style=color:#8be9fd;font-style:italic>range</span>(self<span style=color:#ff79c6>.</span>k):
+</span></span><span style=display:flex><span>                <span style=color:#8be9fd;font-style:italic>print</span>(<span style=color:#f1fa8c>f</span><span style=color:#f1fa8c>&#39;</span><span style=color:#f1fa8c>{</span>center_id<span style=color:#f1fa8c>}</span><span style=color:#f1fa8c>: </span><span style=color:#f1fa8c>{</span>self<span style=color:#ff79c6>.</span>cluster_centers_[center_id]<span style=color:#f1fa8c>}</span><span style=color:#f1fa8c> -&gt; </span><span style=color:#f1fa8c>{</span>new_center[center_id]<span style=color:#f1fa8c>}</span><span style=color:#f1fa8c>&#39;</span>)
+</span></span><span style=display:flex><span>                
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>return</span> new_centers
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib notebook
+</span></span><span style=display:flex><span>plt<span style=color:#ff79c6>.</span>ioff()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>kmedians <span style=color:#ff79c6>=</span> KMedians(k<span style=color:#ff79c6>=</span><span style=color:#bd93f9>3</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>)
+</span></span><span style=display:flex><span>kmedians<span style=color:#ff79c6>.</span>fit(X_toy, cycle_callback<span style=color:#ff79c6>=</span>callback)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib inline
+</span></span></code></pre></div><pre><code>&lt;IPython.core.display.Javascript object&gt;
+</code></pre><h2 id=13-variante-partitioning-around-medoids-pam-ou-k-medoids>1.3 (variante) Partitioning Around Medoids (PAM) ou k-Medoids</h2><p>O algoritmo PAM ou k-Medoids sempre utiliza pontos do próprio conjunto de dados como protótipo. Ele parte de um conjunto de <em>medoids</em> iniciais escolhidos aleatoriamente e funciona fazendo sucessivas substituições dos protótipos atuais por outros pontos que não são atualmente <em>medoids</em>, enquanto busca minimizar um função de distância. Aqui falamos diretamente em distância e, de fato, podemos usar qualquer métrica de distância com esse algorimo. Ao minimizar a distância total dos pontos para os medoids intuitivamente estamos escolhendo os &ldquo;pontos mais centrais&rdquo; nos clusters com os protótipos.</p><p>Um problema dessa abordagem de troca de <em>medoids</em> é o seu custo computacional.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>class</span> <span style=color:#50fa7b>KMedoids</span>(KMeans):
+</span></span><span style=display:flex><span>    <span style=color:#ff79c6>def</span> __init__(self, k, etol<span style=color:#ff79c6>=</span><span style=color:#bd93f9>1e-3</span>, max_iter<span style=color:#ff79c6>=</span><span style=color:#bd93f9>100</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>42</span>, p<span style=color:#ff79c6>=</span><span style=color:#bd93f9>1.5</span>):
+</span></span><span style=display:flex><span>        <span style=color:#8be9fd;font-style:italic>super</span>()<span style=color:#ff79c6>.</span>__init__(k<span style=color:#ff79c6>=</span>k, etol<span style=color:#ff79c6>=</span>etol, max_iter<span style=color:#ff79c6>=</span>max_iter, random_state<span style=color:#ff79c6>=</span>random_state)
+</span></span><span style=display:flex><span>        self<span style=color:#ff79c6>.</span>p <span style=color:#ff79c6>=</span> p
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#ff79c6>def</span> <span style=color:#50fa7b>_clustering_criterion</span>(self, X, center):
+</span></span><span style=display:flex><span>        <span style=color:#6272a4># Estou utilizando a distância Minkowski</span>
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>return</span> np<span style=color:#ff79c6>.</span>sum((np<span style=color:#ff79c6>.</span>abs(X <span style=color:#ff79c6>-</span> center) <span style=color:#ff79c6>**</span> self<span style=color:#ff79c6>.</span>p), axis<span style=color:#ff79c6>=</span><span style=color:#bd93f9>1</span>) <span style=color:#ff79c6>**</span> (<span style=color:#bd93f9>1</span> <span style=color:#ff79c6>/</span> self<span style=color:#ff79c6>.</span>p)
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#ff79c6>def</span> <span style=color:#50fa7b>_update_centers</span>(self, X, verbose<span style=color:#ff79c6>=</span><span style=color:#ff79c6>False</span>):
+</span></span><span style=display:flex><span>        best_cost <span style=color:#ff79c6>=</span> self<span style=color:#ff79c6>.</span>_cost(X, self<span style=color:#ff79c6>.</span>cluster_centers_)
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#6272a4># Inicio com os centros atuais</span>
+</span></span><span style=display:flex><span>        new_centers <span style=color:#ff79c6>=</span> self<span style=color:#ff79c6>.</span>cluster_centers_<span style=color:#ff79c6>.</span>copy()
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#6272a4># Variavel auxiliar</span>
+</span></span><span style=display:flex><span>        aux_centers <span style=color:#ff79c6>=</span> self<span style=color:#ff79c6>.</span>cluster_centers_<span style=color:#ff79c6>.</span>copy()
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>for</span> center_id <span style=color:#ff79c6>in</span> <span style=color:#8be9fd;font-style:italic>range</span>(self<span style=color:#ff79c6>.</span>k):
+</span></span><span style=display:flex><span>            <span style=color:#6272a4># Aqui está a mudança!</span>
+</span></span><span style=display:flex><span>            <span style=color:#ff79c6>for</span> x <span style=color:#ff79c6>in</span> X:
+</span></span><span style=display:flex><span>                <span style=color:#6272a4># Se x já é medoid, pule</span>
+</span></span><span style=display:flex><span>                <span style=color:#ff79c6>if</span> np<span style=color:#ff79c6>.</span>all(np<span style=color:#ff79c6>.</span>isclose(aux_centers[center_id] <span style=color:#ff79c6>-</span> x, <span style=color:#bd93f9>0.</span>)):
+</span></span><span style=display:flex><span>                    <span style=color:#ff79c6>continue</span>
+</span></span><span style=display:flex><span>                aux_centers[center_id] <span style=color:#ff79c6>=</span> x
+</span></span><span style=display:flex><span>            
+</span></span><span style=display:flex><span>                new_cost <span style=color:#ff79c6>=</span> self<span style=color:#ff79c6>.</span>_cost(X, aux_centers)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>                <span style=color:#ff79c6>if</span> new_cost <span style=color:#ff79c6>&lt;</span> best_cost:
+</span></span><span style=display:flex><span>                    best_cost <span style=color:#ff79c6>=</span> new_cost
+</span></span><span style=display:flex><span>                    new_centers[center_id] <span style=color:#ff79c6>=</span> x 
+</span></span><span style=display:flex><span>                <span style=color:#ff79c6>else</span>:
+</span></span><span style=display:flex><span>                    aux_centers[center_id] <span style=color:#ff79c6>=</span> new_centers[center_id]
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>if</span> verbose:
+</span></span><span style=display:flex><span>            <span style=color:#8be9fd;font-style:italic>print</span>(<span style=color:#f1fa8c>&#39;</span><span style=color:#f1fa8c>\n</span><span style=color:#f1fa8c>Mudança dos centros:&#39;</span>)
+</span></span><span style=display:flex><span>            <span style=color:#ff79c6>for</span> center_id <span style=color:#ff79c6>in</span> <span style=color:#8be9fd;font-style:italic>range</span>(self<span style=color:#ff79c6>.</span>k):
+</span></span><span style=display:flex><span>                <span style=color:#8be9fd;font-style:italic>print</span>(<span style=color:#f1fa8c>f</span><span style=color:#f1fa8c>&#39;</span><span style=color:#f1fa8c>{</span>center_id<span style=color:#f1fa8c>}</span><span style=color:#f1fa8c>: </span><span style=color:#f1fa8c>{</span>self<span style=color:#ff79c6>.</span>cluster_centers_[center_id]<span style=color:#f1fa8c>}</span><span style=color:#f1fa8c> -&gt; </span><span style=color:#f1fa8c>{</span>new_center[center_id]<span style=color:#f1fa8c>}</span><span style=color:#f1fa8c>&#39;</span>)
+</span></span><span style=display:flex><span>                
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>return</span> new_centers
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#ff79c6>def</span> <span style=color:#50fa7b>_cost</span>(self, X, centers):
+</span></span><span style=display:flex><span>        <span style=color:#6272a4># Matriz com n_instances x n_clusters</span>
+</span></span><span style=display:flex><span>        errors <span style=color:#ff79c6>=</span> np<span style=color:#ff79c6>.</span>zeros((X<span style=color:#ff79c6>.</span>shape[<span style=color:#bd93f9>0</span>], self<span style=color:#ff79c6>.</span>k))
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>for</span> center_id, center <span style=color:#ff79c6>in</span> <span style=color:#8be9fd;font-style:italic>enumerate</span>(centers):
+</span></span><span style=display:flex><span>            errors[:, center_id] <span style=color:#ff79c6>=</span> self<span style=color:#ff79c6>.</span>_clustering_criterion(X, center)
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        selected <span style=color:#ff79c6>=</span> np<span style=color:#ff79c6>.</span>argmin(errors, axis<span style=color:#ff79c6>=</span><span style=color:#bd93f9>1</span>)
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>return</span> <span style=color:#8be9fd;font-style:italic>sum</span>(<span style=color:#8be9fd;font-style:italic>sum</span>(errors[selected <span style=color:#ff79c6>==</span> cluster_id, cluster_id]) <span style=color:#ff79c6>for</span> cluster_id <span style=color:#ff79c6>in</span> <span style=color:#8be9fd;font-style:italic>range</span>(self<span style=color:#ff79c6>.</span>k))
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib notebook
+</span></span><span style=display:flex><span>plt<span style=color:#ff79c6>.</span>ioff()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>kmedoids <span style=color:#ff79c6>=</span> KMedoids(k<span style=color:#ff79c6>=</span><span style=color:#bd93f9>3</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>)
+</span></span><span style=display:flex><span>kmedoids<span style=color:#ff79c6>.</span>fit(X_toy, cycle_callback<span style=color:#ff79c6>=</span>callback)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib inline
+</span></span></code></pre></div><pre><code>&lt;IPython.core.display.Javascript object&gt;
+</code></pre><h2 id=13-explorando-casos-mais-interessantes>1.3. Explorando casos mais interessantes</h2><p>Vou gerar alguns exemplos extras para observarmos como os algoritmos de agrupamento se comportam.</p><h3 id=131-blobs>1.3.1 Blobs</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>from</span> sklearn <span style=color:#ff79c6>import</span> datasets
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6272a4># Estamos usando y apenas para Taxicab norm or Manhattan norm para propósitos educativos. Nosso problema é não supervisionado</span>
+</span></span><span style=display:flex><span>X_blob1, y_blob1 <span style=color:#ff79c6>=</span> datasets<span style=color:#ff79c6>.</span>make_blobs(n_samples<span style=color:#ff79c6>=</span><span style=color:#bd93f9>100</span>, centers<span style=color:#ff79c6>=</span><span style=color:#bd93f9>3</span>, n_features<span style=color:#ff79c6>=</span><span style=color:#bd93f9>2</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>0</span>, cluster_std<span style=color:#ff79c6>=</span><span style=color:#bd93f9>1</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>plot_cluster(X_blob1, y_blob1)
+</span></span></code></pre></div><p><img src=output_50_0.png alt=png></p><h5 id=k-means>k-Means</h5><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib notebook
+</span></span><span style=display:flex><span>plt<span style=color:#ff79c6>.</span>ioff()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6272a4># Note que &#34;sabemos o número de clusters&#34;</span>
+</span></span><span style=display:flex><span>kmeans_blob1 <span style=color:#ff79c6>=</span> KMeans(k<span style=color:#ff79c6>=</span><span style=color:#bd93f9>3</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>)
+</span></span><span style=display:flex><span>kmeans_blob1<span style=color:#ff79c6>.</span>fit(X_blob1, cycle_callback<span style=color:#ff79c6>=</span>callback)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib inline
+</span></span></code></pre></div><pre><code>&lt;IPython.core.display.Javascript object&gt;
+</code></pre><h5 id=k-medians>k-Medians</h5><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib notebook
+</span></span><span style=display:flex><span>plt<span style=color:#ff79c6>.</span>ioff()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6272a4># Note que &#34;sabemos o número de clusters&#34;</span>
+</span></span><span style=display:flex><span>kmedians_blob1 <span style=color:#ff79c6>=</span> KMedians(k<span style=color:#ff79c6>=</span><span style=color:#bd93f9>3</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>)
+</span></span><span style=display:flex><span>kmedians_blob1<span style=color:#ff79c6>.</span>fit(X_blob1, cycle_callback<span style=color:#ff79c6>=</span>callback)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib inline
+</span></span></code></pre></div><pre><code>&lt;IPython.core.display.Javascript object&gt;
+</code></pre><h5 id=k-medoids>k-Medoids</h5><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib notebook
+</span></span><span style=display:flex><span>plt<span style=color:#ff79c6>.</span>ioff()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6272a4># Note que &#34;sabemos o número de clusters&#34;</span>
+</span></span><span style=display:flex><span>kmedoids_blob1 <span style=color:#ff79c6>=</span> KMedoids(k<span style=color:#ff79c6>=</span><span style=color:#bd93f9>3</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>3</span>)
+</span></span><span style=display:flex><span>kmedoids_blob1<span style=color:#ff79c6>.</span>fit(X_blob1, cycle_callback<span style=color:#ff79c6>=</span>callback)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib inline
+</span></span></code></pre></div><pre><code>&lt;IPython.core.display.Javascript object&gt;
+</code></pre><h6 id=vamos-complicar-um-pouco-as-coisas>Vamos complicar um pouco as coisas</h6><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>X_blob2, y_blob2 <span style=color:#ff79c6>=</span> datasets<span style=color:#ff79c6>.</span>make_blobs(n_samples<span style=color:#ff79c6>=</span><span style=color:#bd93f9>100</span>, centers<span style=color:#ff79c6>=</span><span style=color:#bd93f9>4</span>, n_features<span style=color:#ff79c6>=</span><span style=color:#bd93f9>2</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>0</span>, cluster_std<span style=color:#ff79c6>=</span><span style=color:#bd93f9>0.5</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>plot_cluster(X_blob2, y_blob2)
+</span></span></code></pre></div><p><img src=output_58_0.png alt=png></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib notebook
+</span></span><span style=display:flex><span>plt<span style=color:#ff79c6>.</span>ioff()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6272a4># Estou passando o número &#34;errado&#34; de clusters</span>
+</span></span><span style=display:flex><span>kmeans_blob2 <span style=color:#ff79c6>=</span> KMeans(k<span style=color:#ff79c6>=</span><span style=color:#bd93f9>3</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>)
+</span></span><span style=display:flex><span>kmeans_blob2<span style=color:#ff79c6>.</span>fit(X_blob2, cycle_callback<span style=color:#ff79c6>=</span>callback)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib inline
+</span></span></code></pre></div><pre><code>&lt;IPython.core.display.Javascript object&gt;
+</code></pre><p>O k-Means encontrará os três clusters, como pedimos. Ou quatro&mldr;</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib notebook
+</span></span><span style=display:flex><span>plt<span style=color:#ff79c6>.</span>ioff()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>kmeans_blob2 <span style=color:#ff79c6>=</span> KMeans(k<span style=color:#ff79c6>=</span><span style=color:#bd93f9>4</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>)
+</span></span><span style=display:flex><span>kmeans_blob2<span style=color:#ff79c6>.</span>fit(X_blob2, cycle_callback<span style=color:#ff79c6>=</span>callback)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib inline
+</span></span></code></pre></div><pre><code>&lt;IPython.core.display.Javascript object&gt;
+</code></pre><p>Ou dez!</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib notebook
+</span></span><span style=display:flex><span>plt<span style=color:#ff79c6>.</span>ioff()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6272a4># Estou passando o número &#34;errado&#34; de clusters</span>
+</span></span><span style=display:flex><span>kmeans_blob2 <span style=color:#ff79c6>=</span> KMeans(k<span style=color:#ff79c6>=</span><span style=color:#bd93f9>10</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>)
+</span></span><span style=display:flex><span>kmeans_blob2<span style=color:#ff79c6>.</span>fit(X_blob2, cycle_callback<span style=color:#ff79c6>=</span>callback)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib inline
+</span></span></code></pre></div><pre><code>&lt;IPython.core.display.Javascript object&gt;
+</code></pre><h3 id=132-selecionando-o-número-de-clusters-referênciahttpsscikit-learnorgstablemodulesclusteringhtmlclustering-performance-evaluation>1.3.2 Selecionando o número de clusters (<a href=https://scikit-learn.org/stable/modules/clustering.html#clustering-performance-evaluation>referência</a>)</h3><p>Buscaremos avaliar as partições que encontramos utilizando métricas de avaliação.</p><h4 id=1321-caso-não-supervisionado-elbow-method>1.3.2.1 Caso não-supervisionado: Elbow method</h4><p>Foi o método apresentado em aula e é provavelmente uma das heurísticas mais conhecidas para a escolha do número de clusters no k-Means. Calculamos a soma das diferenças quadráticas de cada ponto para o centróide (<em>within cluster sum of squares</em> ou <em>inertia</em>) ao qual pertence e fazemos um plot variando o valor de <code>k</code>. Nesse gráfico procuramos pelo &ldquo;ponto de cotovelo&rdquo;. No <code>sklearn</code> ela pode ser acessada utilizando <code>kmeans.inertia_</code>, onde <code>kmeans</code> é um modelo já treinado.</p><p>A equação da Inertia (inércia) ou é dada por:</p><p>$\text{Inertia} = \sum_{c \in C} \sum_{x \in c} (x - \overline{c})^2$, onde $C$ é o conjunto de todos os clusters e $\overline{c}$ é o centróide do cluster $c$.</p><p>Nós a implementaremos aqui utilizando métodos do nosso modelo kmeans treinado. Se estiver utilizando o k-Means do <code>sklearn</code> substitua essa função pela propriedade <code>inertia_</code> do <code>KMeans</code>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>def</span> <span style=color:#50fa7b>sum_inertia</span>(X, kmeans):
+</span></span><span style=display:flex><span>    scores <span style=color:#ff79c6>=</span> kmeans<span style=color:#ff79c6>.</span>predict(X)
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    sum_inertia <span style=color:#ff79c6>=</span> <span style=color:#bd93f9>0.</span>
+</span></span><span style=display:flex><span>    <span style=color:#ff79c6>for</span> cluster_id <span style=color:#ff79c6>in</span> np<span style=color:#ff79c6>.</span>unique(scores):
+</span></span><span style=display:flex><span>        imask <span style=color:#ff79c6>=</span> scores <span style=color:#ff79c6>==</span> cluster_id
+</span></span><span style=display:flex><span>        sum_inertia <span style=color:#ff79c6>+=</span> np<span style=color:#ff79c6>.</span>sum(
+</span></span><span style=display:flex><span>            kmeans<span style=color:#ff79c6>.</span>_clustering_criterion(X[imask], kmeans<span style=color:#ff79c6>.</span>cluster_centers_[cluster_id]))
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#ff79c6>return</span> sum_inertia
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#6272a4># Primeiro dataset</span>
+</span></span><span style=display:flex><span>inertia_scores <span style=color:#ff79c6>=</span> []
+</span></span><span style=display:flex><span><span style=color:#ff79c6>for</span> k <span style=color:#ff79c6>in</span> <span style=color:#8be9fd;font-style:italic>range</span>(<span style=color:#bd93f9>2</span>, <span style=color:#bd93f9>10</span>):
+</span></span><span style=display:flex><span>    kmeans <span style=color:#ff79c6>=</span> KMeans(k<span style=color:#ff79c6>=</span>k, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>)
+</span></span><span style=display:flex><span>    kmeans<span style=color:#ff79c6>.</span>fit(X_blob1)
+</span></span><span style=display:flex><span>    inertia_scores<span style=color:#ff79c6>.</span>append(sum_inertia(X_blob1, kmeans))
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>fig, ax <span style=color:#ff79c6>=</span> plt<span style=color:#ff79c6>.</span>subplots(figsize<span style=color:#ff79c6>=</span>(<span style=color:#bd93f9>6</span>, <span style=color:#bd93f9>3</span>))
+</span></span><span style=display:flex><span>ax<span style=color:#ff79c6>.</span>plot(<span style=color:#8be9fd;font-style:italic>range</span>(<span style=color:#bd93f9>2</span>, <span style=color:#bd93f9>10</span>), inertia_scores)
+</span></span><span style=display:flex><span>ax<span style=color:#ff79c6>.</span>set_xlabel(<span style=color:#f1fa8c>&#39;k&#39;</span>)
+</span></span><span style=display:flex><span>ax<span style=color:#ff79c6>.</span>set_ylabel(<span style=color:#f1fa8c>&#39;Inertia&#39;</span>)
+</span></span><span style=display:flex><span>plt<span style=color:#ff79c6>.</span>show()
+</span></span></code></pre></div><p><img src=output_67_0.png alt=png></p><p>O &ldquo;cotovelo&rdquo; está em <code>k=3</code>, como esperado.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#6272a4># Segundo dataset</span>
+</span></span><span style=display:flex><span>inertia_scores <span style=color:#ff79c6>=</span> []
+</span></span><span style=display:flex><span><span style=color:#ff79c6>for</span> k <span style=color:#ff79c6>in</span> <span style=color:#8be9fd;font-style:italic>range</span>(<span style=color:#bd93f9>2</span>, <span style=color:#bd93f9>10</span>):
+</span></span><span style=display:flex><span>    kmeans <span style=color:#ff79c6>=</span> KMeans(k<span style=color:#ff79c6>=</span>k, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>)
+</span></span><span style=display:flex><span>    kmeans<span style=color:#ff79c6>.</span>fit(X_blob2)
+</span></span><span style=display:flex><span>    inertia_scores<span style=color:#ff79c6>.</span>append(sum_inertia(X_blob2, kmeans))
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>fig, ax <span style=color:#ff79c6>=</span> plt<span style=color:#ff79c6>.</span>subplots(figsize<span style=color:#ff79c6>=</span>(<span style=color:#bd93f9>6</span>, <span style=color:#bd93f9>3</span>))
+</span></span><span style=display:flex><span>ax<span style=color:#ff79c6>.</span>plot(<span style=color:#8be9fd;font-style:italic>range</span>(<span style=color:#bd93f9>2</span>, <span style=color:#bd93f9>10</span>), inertia_scores)
+</span></span><span style=display:flex><span>ax<span style=color:#ff79c6>.</span>set_xlabel(<span style=color:#f1fa8c>&#39;k&#39;</span>)
+</span></span><span style=display:flex><span>ax<span style=color:#ff79c6>.</span>set_ylabel(<span style=color:#f1fa8c>&#39;Inertia&#39;</span>)
+</span></span><span style=display:flex><span>plt<span style=color:#ff79c6>.</span>show()
+</span></span></code></pre></div><p><img src=output_70_0.png alt=png></p><p>Aqui, a mudança mais brusca (cotovelo) ocorre em <code>k=4</code>.</p><h4 id=1322-caso-não-supervisionado-silhueta-silhouette>1.3.2.2 Caso não supervisionado: silhueta (silhouette)</h4><p>Uma forma simples de estimarmos o número de clusters é avaliarmos valores crescentes de <code>k</code> plotarmos os valores de silhueta obtidos. A nossa medida aqui é a silhueta que varia entre $[-1, 1]$, sendo $1$ o melhor valor possível. Essa métrica avalia a densidade das partições encontradas.</p><ul><li><strong>Vantagens silhueta</strong><ul><li>Métrica em intervalo bem definido: de -1 (ruim), passando por 0 (clusters com <em>overlap</em>), até 1 (bom)</li><li>Os valores são altos quando os clusters são densos e bem separados, o que está intimamente ligado à noção usual de agrupamento.</li></ul></li><li><strong>Desvantagem</strong><ul><li>O k-Means cria estruturas convexas, de fato, estruturas similares à hiper-esferas (ou uma gaussiana multivariada). Essa métrica favorece esse tipo de estrutura. Clusters encontrados por outras estratégias de particionamento, como o agrupamento por densidade, tendem a obter menores valores de silhueta (e nem por isso são piores).</li></ul></li></ul><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>from</span> sklearn.metrics <span style=color:#ff79c6>import</span> silhouette_score
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6272a4># Primeiro dataset</span>
+</span></span><span style=display:flex><span>silh_scores <span style=color:#ff79c6>=</span> []
+</span></span><span style=display:flex><span><span style=color:#ff79c6>for</span> k <span style=color:#ff79c6>in</span> <span style=color:#8be9fd;font-style:italic>range</span>(<span style=color:#bd93f9>2</span>, <span style=color:#bd93f9>10</span>):
+</span></span><span style=display:flex><span>    kmeans <span style=color:#ff79c6>=</span> KMeans(k<span style=color:#ff79c6>=</span>k, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>)
+</span></span><span style=display:flex><span>    kmeans<span style=color:#ff79c6>.</span>fit(X_blob1)
+</span></span><span style=display:flex><span>    silh_scores<span style=color:#ff79c6>.</span>append(silhouette_score(X_blob1, kmeans<span style=color:#ff79c6>.</span>predict(X_blob1)))
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>fig, ax <span style=color:#ff79c6>=</span> plt<span style=color:#ff79c6>.</span>subplots(figsize<span style=color:#ff79c6>=</span>(<span style=color:#bd93f9>6</span>, <span style=color:#bd93f9>3</span>))
+</span></span><span style=display:flex><span>ax<span style=color:#ff79c6>.</span>plot(<span style=color:#8be9fd;font-style:italic>range</span>(<span style=color:#bd93f9>2</span>, <span style=color:#bd93f9>10</span>), silh_scores)
+</span></span><span style=display:flex><span>ax<span style=color:#ff79c6>.</span>set_xlabel(<span style=color:#f1fa8c>&#39;k&#39;</span>)
+</span></span><span style=display:flex><span>ax<span style=color:#ff79c6>.</span>set_ylabel(<span style=color:#f1fa8c>&#39;Silhouette&#39;</span>)
+</span></span><span style=display:flex><span>plt<span style=color:#ff79c6>.</span>show()
+</span></span></code></pre></div><p><img src=output_74_0.png alt=png></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#6272a4># Segundo dataset</span>
+</span></span><span style=display:flex><span>silh_scores <span style=color:#ff79c6>=</span> []
+</span></span><span style=display:flex><span><span style=color:#ff79c6>for</span> k <span style=color:#ff79c6>in</span> <span style=color:#8be9fd;font-style:italic>range</span>(<span style=color:#bd93f9>2</span>, <span style=color:#bd93f9>10</span>):
+</span></span><span style=display:flex><span>    kmeans <span style=color:#ff79c6>=</span> KMeans(k<span style=color:#ff79c6>=</span>k, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>)
+</span></span><span style=display:flex><span>    kmeans<span style=color:#ff79c6>.</span>fit(X_blob2)
+</span></span><span style=display:flex><span>    silh_scores<span style=color:#ff79c6>.</span>append(silhouette_score(X_blob2, kmeans<span style=color:#ff79c6>.</span>predict(X_blob2)))
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>fig, ax <span style=color:#ff79c6>=</span> plt<span style=color:#ff79c6>.</span>subplots(figsize<span style=color:#ff79c6>=</span>(<span style=color:#bd93f9>6</span>, <span style=color:#bd93f9>3</span>))
+</span></span><span style=display:flex><span>ax<span style=color:#ff79c6>.</span>plot(<span style=color:#8be9fd;font-style:italic>range</span>(<span style=color:#bd93f9>2</span>, <span style=color:#bd93f9>10</span>), silh_scores)
+</span></span><span style=display:flex><span>ax<span style=color:#ff79c6>.</span>set_xlabel(<span style=color:#f1fa8c>&#39;k&#39;</span>)
+</span></span><span style=display:flex><span>ax<span style=color:#ff79c6>.</span>set_ylabel(<span style=color:#f1fa8c>&#39;Silhouette&#39;</span>)
+</span></span><span style=display:flex><span>plt<span style=color:#ff79c6>.</span>show()
+</span></span></code></pre></div><p><img src=output_76_0.png alt=png></p><p>Escolhemos o ponto que maximiza a silhueta média (<code>k=3</code> e <code>k=4</code> para o primeiro e segundo casos, respectivamente).</p><p>Devemos lembrar que a silhueta é definida para cada ponto. Até agora consideramos apenas valores médios.</p><h5 id=abordagem-mais-geral>Abordagem mais geral</h5><p>Utilizarei uma outra abordagem, sugerida pelo <code>sklearn</code>, baseada em <a href=https://scikit-learn.org/stable/auto_examples/cluster/plot_kmeans_silhouette_analysis.html>silhouette analysis</a>. Esta abordagem considera tanto a silhueta média, como a silhueta de cada ponto.</p><p>Definirei uma função de plot extra:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>from</span> sklearn.metrics <span style=color:#ff79c6>import</span> silhouette_score, silhouette_samples
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>import</span> matplotlib.pyplot <span style=color:#ff79c6>as</span> plt
+</span></span><span style=display:flex><span><span style=color:#ff79c6>import</span> matplotlib.cm <span style=color:#ff79c6>as</span> cm
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>def</span> <span style=color:#50fa7b>plot_silhouettes</span>(X, k, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>42</span>):
+</span></span><span style=display:flex><span>    fig, ax <span style=color:#ff79c6>=</span> plt<span style=color:#ff79c6>.</span>subplots(figsize<span style=color:#ff79c6>=</span>(<span style=color:#bd93f9>10</span>, <span style=color:#bd93f9>5</span>))
+</span></span><span style=display:flex><span>    ax<span style=color:#ff79c6>.</span>set_xlim([<span style=color:#ff79c6>-</span><span style=color:#bd93f9>1</span>, <span style=color:#bd93f9>1</span>])
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#6272a4># Use esta linha para a implementação didática</span>
+</span></span><span style=display:flex><span>    clusterer <span style=color:#ff79c6>=</span> KMeans(k<span style=color:#ff79c6>=</span>k, random_state<span style=color:#ff79c6>=</span>random_state)
+</span></span><span style=display:flex><span>    <span style=color:#6272a4># Use essa linha se estiver usando a versão do sklearn</span>
+</span></span><span style=display:flex><span>    <span style=color:#6272a4># clusterer = KMeans(n_clusters=k, random_state=random_state)</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    clusterer<span style=color:#ff79c6>.</span>fit(X)
+</span></span><span style=display:flex><span>    cluster_labels <span style=color:#ff79c6>=</span> clusterer<span style=color:#ff79c6>.</span>predict(X)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#6272a4># Silhueta para cada ponto</span>
+</span></span><span style=display:flex><span>    sample_silhouette_values <span style=color:#ff79c6>=</span> silhouette_samples(X, cluster_labels)
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#6272a4># Silhueta média</span>
+</span></span><span style=display:flex><span>    silhouette_avg <span style=color:#ff79c6>=</span> silhouette_score(X, cluster_labels)
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    y_lower <span style=color:#ff79c6>=</span> <span style=color:#bd93f9>10</span>  <span style=color:#6272a4># Padding</span>
+</span></span><span style=display:flex><span>    <span style=color:#ff79c6>for</span> i <span style=color:#ff79c6>in</span> <span style=color:#8be9fd;font-style:italic>range</span>(k):
+</span></span><span style=display:flex><span>        <span style=color:#6272a4># Seleciona as silhuetas de cada cluster e as ordena</span>
+</span></span><span style=display:flex><span>        cluster_silh <span style=color:#ff79c6>=</span> sample_silhouette_values[cluster_labels <span style=color:#ff79c6>==</span> i]
+</span></span><span style=display:flex><span>        cluster_silh<span style=color:#ff79c6>.</span>sort()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        size_cluster <span style=color:#ff79c6>=</span> <span style=color:#8be9fd;font-style:italic>len</span>(cluster_silh)
+</span></span><span style=display:flex><span>        y_upper <span style=color:#ff79c6>=</span> y_lower <span style=color:#ff79c6>+</span> size_cluster
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        color <span style=color:#ff79c6>=</span> cm<span style=color:#ff79c6>.</span>nipy_spectral(<span style=color:#8be9fd;font-style:italic>float</span>(i) <span style=color:#ff79c6>/</span> k)
+</span></span><span style=display:flex><span>        ax<span style=color:#ff79c6>.</span>fill_betweenx(np<span style=color:#ff79c6>.</span>arange(y_lower, y_upper),
+</span></span><span style=display:flex><span>                         <span style=color:#bd93f9>0</span>, cluster_silh, facecolor<span style=color:#ff79c6>=</span>color,
+</span></span><span style=display:flex><span>                         edgecolor<span style=color:#ff79c6>=</span>color, alpha<span style=color:#ff79c6>=</span><span style=color:#bd93f9>0.7</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#6272a4># Nome dos clusters</span>
+</span></span><span style=display:flex><span>        ax<span style=color:#ff79c6>.</span>text(<span style=color:#ff79c6>-</span><span style=color:#bd93f9>0.05</span>, y_lower <span style=color:#ff79c6>+</span> <span style=color:#bd93f9>0.5</span> <span style=color:#ff79c6>*</span> size_cluster, <span style=color:#8be9fd;font-style:italic>str</span>(i))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#6272a4># Compute the new y_lower for next plot</span>
+</span></span><span style=display:flex><span>        y_lower <span style=color:#ff79c6>=</span> y_upper <span style=color:#ff79c6>+</span> <span style=color:#bd93f9>10</span>  <span style=color:#6272a4># 10 for the 0 samples</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    ax<span style=color:#ff79c6>.</span>set_title(<span style=color:#f1fa8c>f</span><span style=color:#f1fa8c>&#39;k=</span><span style=color:#f1fa8c>{</span>k<span style=color:#f1fa8c>}</span><span style=color:#f1fa8c>&#39;</span>)
+</span></span><span style=display:flex><span>    ax<span style=color:#ff79c6>.</span>set_xlabel(<span style=color:#f1fa8c>&#39;Silhueta&#39;</span>)
+</span></span><span style=display:flex><span>    ax<span style=color:#ff79c6>.</span>set_ylabel(<span style=color:#f1fa8c>&#39;Cluster&#39;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#6272a4># Linha vertical indicando a silhueta média</span>
+</span></span><span style=display:flex><span>    ax<span style=color:#ff79c6>.</span>axvline(x<span style=color:#ff79c6>=</span>silhouette_avg, color<span style=color:#ff79c6>=</span><span style=color:#f1fa8c>&#34;red&#34;</span>, linestyle<span style=color:#ff79c6>=</span><span style=color:#f1fa8c>&#34;--&#34;</span>)
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    ax<span style=color:#ff79c6>.</span>set_yticks([])
+</span></span></code></pre></div><p><strong>O que devemos observar nesse plot:</strong></p><ol><li>O eixo x apresenta os valores de silhueta</li><li>Os clusters são apresentados de forma separada</li><li>Para cada cluster, as instâncias que a eles pertecem estão ordenadas pelos seus valores individuais de silhueta</li><li>A silhueta média é indicada pela linha vertical (serrilhada) vermelha</li></ol><p><strong>Como escolher <code>k</code> a partir desse plot?</strong></p><ol><li>Queremos que a largura das barras (variação no eixo <code>y</code>) sejam similares.</li><li>Queremos que os comprimentos das barras estejam acima ou próximas do valor de silhueta médio (nunca abaixo).</li><li>Queremos um valor de <code>k</code> que não acarrete flutuações nos comprimentos (todas as barras com comprimentos similares).</li><li>Não queremos silhuetas negativas!</li></ol><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>plot_silhouettes(X_blob2, <span style=color:#bd93f9>2</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>)
+</span></span></code></pre></div><p><img src=output_80_0.png alt=png></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>plot_silhouettes(X_blob2, <span style=color:#bd93f9>3</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>)
+</span></span></code></pre></div><p><img src=output_81_0.png alt=png></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>plot_silhouettes(X_blob2, <span style=color:#bd93f9>4</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>)
+</span></span></code></pre></div><p><img src=output_82_0.png alt=png></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>plot_silhouettes(X_blob2, <span style=color:#bd93f9>5</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>)
+</span></span></code></pre></div><p><img src=output_83_0.png alt=png></p><p>O nosso vencedor foi <code>k=4</code>, como esperado.</p><p><strong>Atenção:</strong> notem como eu usei uma random seed diferente. Em nossa implementação, utilizamos apenas uma inicialização aleatória dos centroides. Como eu já mencionei, existem formas mais &ldquo;espertas&rdquo; de se fazer isso. Tais estratégias fazem toda a diferença! Além disso, o <code>sklearn</code> prevê também utilizar várias inicializações e escolher qual delas for a melhor (isso é um hiperparâmetro).</p><p><strong>&ldquo;Tarefa&rdquo;:</strong> quem tiver curiosidade, experimente mudar os <code>random_state</code> nos gráficos anteriores e nos próximos para observar o impacto.</p><h4 id=1323-caso-supervisionado-adjusted-rand-index>1.3.2.3 Caso supervisionado: Adjusted Rand Index</h4><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>from</span> sklearn.metrics <span style=color:#ff79c6>import</span> adjusted_rand_score
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6272a4># Primeiro dataset</span>
+</span></span><span style=display:flex><span>rand_scores <span style=color:#ff79c6>=</span> []
+</span></span><span style=display:flex><span><span style=color:#ff79c6>for</span> k <span style=color:#ff79c6>in</span> <span style=color:#8be9fd;font-style:italic>range</span>(<span style=color:#bd93f9>2</span>, <span style=color:#bd93f9>10</span>):
+</span></span><span style=display:flex><span>    kmeans <span style=color:#ff79c6>=</span> KMeans(k<span style=color:#ff79c6>=</span>k, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>)
+</span></span><span style=display:flex><span>    kmeans<span style=color:#ff79c6>.</span>fit(X_blob1)
+</span></span><span style=display:flex><span>    rand_scores<span style=color:#ff79c6>.</span>append(adjusted_rand_score(y_blob1, kmeans<span style=color:#ff79c6>.</span>predict(X_blob1)))
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>fig, ax <span style=color:#ff79c6>=</span> plt<span style=color:#ff79c6>.</span>subplots(figsize<span style=color:#ff79c6>=</span>(<span style=color:#bd93f9>6</span>, <span style=color:#bd93f9>3</span>))
+</span></span><span style=display:flex><span>ax<span style=color:#ff79c6>.</span>plot(<span style=color:#8be9fd;font-style:italic>range</span>(<span style=color:#bd93f9>2</span>, <span style=color:#bd93f9>10</span>), rand_scores)
+</span></span><span style=display:flex><span>ax<span style=color:#ff79c6>.</span>set_xlabel(<span style=color:#f1fa8c>&#39;k&#39;</span>)
+</span></span><span style=display:flex><span>ax<span style=color:#ff79c6>.</span>set_ylabel(<span style=color:#f1fa8c>&#39;Adjusted Rand Index&#39;</span>)
+</span></span><span style=display:flex><span>plt<span style=color:#ff79c6>.</span>show()
+</span></span></code></pre></div><p><img src=output_87_0.png alt=png></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#6272a4># Segundo dataset</span>
+</span></span><span style=display:flex><span>rand_scores <span style=color:#ff79c6>=</span> []
+</span></span><span style=display:flex><span><span style=color:#ff79c6>for</span> k <span style=color:#ff79c6>in</span> <span style=color:#8be9fd;font-style:italic>range</span>(<span style=color:#bd93f9>2</span>, <span style=color:#bd93f9>10</span>):
+</span></span><span style=display:flex><span>    kmeans <span style=color:#ff79c6>=</span> KMeans(k<span style=color:#ff79c6>=</span>k, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>)
+</span></span><span style=display:flex><span>    kmeans<span style=color:#ff79c6>.</span>fit(X_blob2)
+</span></span><span style=display:flex><span>    rand_scores<span style=color:#ff79c6>.</span>append(adjusted_rand_score(y_blob2, kmeans<span style=color:#ff79c6>.</span>predict(X_blob2)))
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>fig, ax <span style=color:#ff79c6>=</span> plt<span style=color:#ff79c6>.</span>subplots(figsize<span style=color:#ff79c6>=</span>(<span style=color:#bd93f9>6</span>, <span style=color:#bd93f9>3</span>))
+</span></span><span style=display:flex><span>ax<span style=color:#ff79c6>.</span>plot(<span style=color:#8be9fd;font-style:italic>range</span>(<span style=color:#bd93f9>2</span>, <span style=color:#bd93f9>10</span>), rand_scores)
+</span></span><span style=display:flex><span>ax<span style=color:#ff79c6>.</span>set_xlabel(<span style=color:#f1fa8c>&#39;k&#39;</span>)
+</span></span><span style=display:flex><span>ax<span style=color:#ff79c6>.</span>set_ylabel(<span style=color:#f1fa8c>&#39;Adjusted Rand Index&#39;</span>)
+</span></span><span style=display:flex><span>plt<span style=color:#ff79c6>.</span>show()
+</span></span></code></pre></div><p><img src=output_89_0.png alt=png></p><p><strong>Vantagens do <em>Adjusted Rand Index</em> (ARI)</strong>:</p><ul><li>Predição aleatória origina um valor de ARI próximo de zero</li><li>Ranges bem definidos: $[-1, 1]$<ul><li>$-1$ é ruim</li><li>$0$ é a predição aleatória</li><li>$1$ é o melhor valor possível</li></ul></li><li>Ignora permutações</li><li>É simétrica <code>ARI(A, B) == ARI(B, A)</code></li><li>Não assume nada sobre a estrutura dos clusters</li></ul><p><strong>Desvantagem:</strong></p><ul><li>Supervisionada, o que não é realístico na maioria dos casos</li></ul><h3 id=133-nem-tudo-são-flores-dataset-circles>1.3.3. Nem tudo são flores: dataset Circles</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>X_circ1, y_circ1 <span style=color:#ff79c6>=</span> datasets<span style=color:#ff79c6>.</span>make_circles(n_samples<span style=color:#ff79c6>=</span><span style=color:#bd93f9>500</span>, noise<span style=color:#ff79c6>=</span><span style=color:#bd93f9>0.05</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>, factor<span style=color:#ff79c6>=</span><span style=color:#bd93f9>0.1</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>plot_cluster(X_circ1, y_circ1)
+</span></span></code></pre></div><p><img src=output_92_0.png alt=png></p><p>Dois clusters! Sopinha de algodão, certo? Vamos ver</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib notebook
+</span></span><span style=display:flex><span>plt<span style=color:#ff79c6>.</span>ioff()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>kmeans_circ1 <span style=color:#ff79c6>=</span> KMeans(k<span style=color:#ff79c6>=</span><span style=color:#bd93f9>2</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>)
+</span></span><span style=display:flex><span>kmeans_circ1<span style=color:#ff79c6>.</span>fit(X_circ1, cycle_callback<span style=color:#ff79c6>=</span>callback)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib inline
+</span></span></code></pre></div><pre><code>&lt;IPython.core.display.Javascript object&gt;
+</code></pre><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib notebook
+</span></span><span style=display:flex><span>plt<span style=color:#ff79c6>.</span>ioff()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>kmeans_circ1 <span style=color:#ff79c6>=</span> KMeans(k<span style=color:#ff79c6>=</span><span style=color:#bd93f9>2</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>1</span>)
+</span></span><span style=display:flex><span>kmeans_circ1<span style=color:#ff79c6>.</span>fit(X_circ1, cycle_callback<span style=color:#ff79c6>=</span>callback)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib inline
+</span></span></code></pre></div><pre><code>&lt;IPython.core.display.Javascript object&gt;
+</code></pre><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib notebook
+</span></span><span style=display:flex><span>plt<span style=color:#ff79c6>.</span>ioff()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>kmeans_circ1 <span style=color:#ff79c6>=</span> KMeans(k<span style=color:#ff79c6>=</span><span style=color:#bd93f9>2</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>3</span>)
+</span></span><span style=display:flex><span>kmeans_circ1<span style=color:#ff79c6>.</span>fit(X_circ1, cycle_callback<span style=color:#ff79c6>=</span>callback)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib inline
+</span></span></code></pre></div><pre><code>&lt;IPython.core.display.Javascript object&gt;
+</code></pre><p>E agora? Uma saída poderia ser aumentar o número de clusters e contar com um especialista humano para nos dizer que múltiplos grupos representam um mesmo conceito:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib notebook
+</span></span><span style=display:flex><span>plt<span style=color:#ff79c6>.</span>ioff()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>kmeans_circ1 <span style=color:#ff79c6>=</span> KMeans(k<span style=color:#ff79c6>=</span><span style=color:#bd93f9>5</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>)
+</span></span><span style=display:flex><span>kmeans_circ1<span style=color:#ff79c6>.</span>fit(X_circ1, cycle_callback<span style=color:#ff79c6>=</span>callback)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib inline
+</span></span></code></pre></div><pre><code>&lt;IPython.core.display.Javascript object&gt;
+</code></pre><p>Nesse caso, e para essa seed aleatória (e apenas uma inicialização) temos que os clusters $k \in {0, 2, 3, 4}$ representam o mesmo &ldquo;conceito&rdquo;, i.e., o círculo externo. Nós sabemos isso porque nossos dados estão em duas dimensões e foram gerados artificialmente.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>plot_silhouettes(X_circ1, <span style=color:#bd93f9>2</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>)
+</span></span></code></pre></div><p><img src=output_100_0.png alt=png></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>plot_silhouettes(X_circ1, <span style=color:#bd93f9>5</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>)
+</span></span></code></pre></div><p><img src=output_101_0.png alt=png></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>plot_silhouettes(X_circ1, <span style=color:#bd93f9>10</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>)
+</span></span></code></pre></div><p><img src=output_102_0.png alt=png></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib notebook
+</span></span><span style=display:flex><span>plt<span style=color:#ff79c6>.</span>ioff()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>kmeans_circ1 <span style=color:#ff79c6>=</span> KMeans(k<span style=color:#ff79c6>=</span><span style=color:#bd93f9>10</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>)
+</span></span><span style=display:flex><span>kmeans_circ1<span style=color:#ff79c6>.</span>fit(X_circ1, cycle_callback<span style=color:#ff79c6>=</span>callback)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib inline
+</span></span></code></pre></div><pre><code>&lt;IPython.core.display.Javascript object&gt;
+</code></pre><p>Percebemos que apesar de <code>k=5</code> responder bem ao nosso problema, como observado empiricamente, a silhueta está privilegiando estruturas (hiper-esféricas) circulares e densas, como previamente discutido. Por essa razão $k=10$ poderia ser uma escolha boa segundo os critérios previamente discutidos.</p><p>O problema vai mais longe&mldr; E se a estrutura fosse mais dúbia?</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>X_circ2, y_circ2 <span style=color:#ff79c6>=</span> datasets<span style=color:#ff79c6>.</span>make_circles(n_samples<span style=color:#ff79c6>=</span><span style=color:#bd93f9>500</span>, noise<span style=color:#ff79c6>=</span><span style=color:#bd93f9>0.05</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>, factor<span style=color:#ff79c6>=</span><span style=color:#bd93f9>0.7</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>plot_cluster(X_circ2, y_circ2)
+</span></span></code></pre></div><p><img src=output_105_0.png alt=png></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib notebook
+</span></span><span style=display:flex><span>plt<span style=color:#ff79c6>.</span>ioff()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6272a4># k-Means</span>
+</span></span><span style=display:flex><span>kmeans_circ2 <span style=color:#ff79c6>=</span> KMeans(k<span style=color:#ff79c6>=</span><span style=color:#bd93f9>5</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>)
+</span></span><span style=display:flex><span>kmeans_circ2<span style=color:#ff79c6>.</span>fit(X_circ2, cycle_callback<span style=color:#ff79c6>=</span>callback)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib inline
+</span></span></code></pre></div><pre><code>&lt;IPython.core.display.Javascript object&gt;
+</code></pre><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib notebook
+</span></span><span style=display:flex><span>plt<span style=color:#ff79c6>.</span>ioff()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6272a4># k-Medians</span>
+</span></span><span style=display:flex><span>kmedians_circ2 <span style=color:#ff79c6>=</span> KMedians(k<span style=color:#ff79c6>=</span><span style=color:#bd93f9>5</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>)
+</span></span><span style=display:flex><span>kmedians_circ2<span style=color:#ff79c6>.</span>fit(X_circ2, cycle_callback<span style=color:#ff79c6>=</span>callback)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib inline
+</span></span></code></pre></div><pre><code>&lt;IPython.core.display.Javascript object&gt;
+</code></pre><p>É, agora complicou o meio de campo. :P</p><p>E esse é apenas um dos exemplos. Podemos manter o padrão da primeira variante desse dataset com a adição de ruído para perceber um outro problema nesse tipo de abordagem.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>X_circ3, y_circ3 <span style=color:#ff79c6>=</span> datasets<span style=color:#ff79c6>.</span>make_circles(n_samples<span style=color:#ff79c6>=</span><span style=color:#bd93f9>500</span>, noise<span style=color:#ff79c6>=</span><span style=color:#bd93f9>0.15</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>, factor<span style=color:#ff79c6>=</span><span style=color:#bd93f9>0.3</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6272a4># Vou até acelerar os plots:</span>
+</span></span><span style=display:flex><span>callback <span style=color:#ff79c6>=</span> plot_callback_factory(<span style=color:#bd93f9>0.1</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>plot_cluster(X_circ3, y_circ3)
+</span></span></code></pre></div><p><img src=output_109_0.png alt=png></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib notebook
+</span></span><span style=display:flex><span>plt<span style=color:#ff79c6>.</span>ioff()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6272a4># k-Means</span>
+</span></span><span style=display:flex><span>kmeans_circ3 <span style=color:#ff79c6>=</span> KMeans(k<span style=color:#ff79c6>=</span><span style=color:#bd93f9>2</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>)
+</span></span><span style=display:flex><span>kmeans_circ3<span style=color:#ff79c6>.</span>fit(X_circ3, cycle_callback<span style=color:#ff79c6>=</span>callback)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib inline
+</span></span></code></pre></div><pre><code>&lt;IPython.core.display.Javascript object&gt;
+</code></pre><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib notebook
+</span></span><span style=display:flex><span>plt<span style=color:#ff79c6>.</span>ioff()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6272a4># k-Means</span>
+</span></span><span style=display:flex><span>kmeans_circ3 <span style=color:#ff79c6>=</span> KMeans(k<span style=color:#ff79c6>=</span><span style=color:#bd93f9>3</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>)
+</span></span><span style=display:flex><span>kmeans_circ3<span style=color:#ff79c6>.</span>fit(X_circ3, cycle_callback<span style=color:#ff79c6>=</span>callback)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib inline
+</span></span></code></pre></div><pre><code>&lt;IPython.core.display.Javascript object&gt;
+</code></pre><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib notebook
+</span></span><span style=display:flex><span>plt<span style=color:#ff79c6>.</span>ioff()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6272a4># k-Means</span>
+</span></span><span style=display:flex><span>kmeans_circ3 <span style=color:#ff79c6>=</span> KMeans(k<span style=color:#ff79c6>=</span><span style=color:#bd93f9>5</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>)
+</span></span><span style=display:flex><span>kmeans_circ3<span style=color:#ff79c6>.</span>fit(X_circ3, cycle_callback<span style=color:#ff79c6>=</span>callback)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib inline
+</span></span></code></pre></div><pre><code>&lt;IPython.core.display.Javascript object&gt;
+</code></pre><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib notebook
+</span></span><span style=display:flex><span>plt<span style=color:#ff79c6>.</span>ioff()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6272a4># k-Means</span>
+</span></span><span style=display:flex><span>kmeans_circ3 <span style=color:#ff79c6>=</span> KMeans(k<span style=color:#ff79c6>=</span><span style=color:#bd93f9>10</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>)
+</span></span><span style=display:flex><span>kmeans_circ3<span style=color:#ff79c6>.</span>fit(X_circ3, cycle_callback<span style=color:#ff79c6>=</span>callback)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib inline
+</span></span></code></pre></div><pre><code>&lt;IPython.core.display.Javascript object&gt;
+</code></pre><h3 id=134-moons>1.3.4 Moons</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>X_moons1, y_moons1 <span style=color:#ff79c6>=</span> datasets<span style=color:#ff79c6>.</span>make_moons(random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>, noise<span style=color:#ff79c6>=</span><span style=color:#bd93f9>0.05</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>plot_cluster(X_moons1, y_moons1)
+</span></span></code></pre></div><p><img src=output_115_0.png alt=png></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib notebook
+</span></span><span style=display:flex><span>plt<span style=color:#ff79c6>.</span>ioff()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6272a4># k-Means</span>
+</span></span><span style=display:flex><span>kmeans_moons1 <span style=color:#ff79c6>=</span> KMeans(k<span style=color:#ff79c6>=</span><span style=color:#bd93f9>2</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>)
+</span></span><span style=display:flex><span>kmeans_moons1<span style=color:#ff79c6>.</span>fit(X_moons1, cycle_callback<span style=color:#ff79c6>=</span>callback)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib inline
+</span></span></code></pre></div><pre><code>&lt;IPython.core.display.Javascript object&gt;
+</code></pre><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib notebook
+</span></span><span style=display:flex><span>plt<span style=color:#ff79c6>.</span>ioff()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6272a4># k-Means</span>
+</span></span><span style=display:flex><span>kmeans_moons1 <span style=color:#ff79c6>=</span> KMeans(k<span style=color:#ff79c6>=</span><span style=color:#bd93f9>5</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>)
+</span></span><span style=display:flex><span>kmeans_moons1<span style=color:#ff79c6>.</span>fit(X_moons1, cycle_callback<span style=color:#ff79c6>=</span>callback)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib inline
+</span></span></code></pre></div><pre><code>&lt;IPython.core.display.Javascript object&gt;
+</code></pre><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>plot_silhouettes(X_moons1, <span style=color:#bd93f9>2</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>)
+</span></span></code></pre></div><p><img src=output_118_0.png alt=png></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>kmeans_moons1 <span style=color:#ff79c6>=</span> KMeans(k<span style=color:#ff79c6>=</span><span style=color:#bd93f9>2</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>)
+</span></span><span style=display:flex><span>kmeans_moons1<span style=color:#ff79c6>.</span>fit(X_moons1)
+</span></span><span style=display:flex><span>adjusted_rand_score(y_moons1, kmeans_moons1<span style=color:#ff79c6>.</span>predict(X_moons1))
+</span></span></code></pre></div><pre><code>0.26295510204081635
+</code></pre><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>plot_silhouettes(X_moons1, <span style=color:#bd93f9>3</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>)
+</span></span></code></pre></div><p><img src=output_120_0.png alt=png></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>kmeans_moons1 <span style=color:#ff79c6>=</span> KMeans(k<span style=color:#ff79c6>=</span><span style=color:#bd93f9>3</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>)
+</span></span><span style=display:flex><span>kmeans_moons1<span style=color:#ff79c6>.</span>fit(X_moons1)
+</span></span><span style=display:flex><span>adjusted_rand_score(y_moons1, kmeans_moons1<span style=color:#ff79c6>.</span>predict(X_moons1))
+</span></span></code></pre></div><pre><code>0.2706764455503896
+</code></pre><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>plot_silhouettes(X_moons1, <span style=color:#bd93f9>5</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>)
+</span></span></code></pre></div><p><img src=output_122_0.png alt=png></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>kmeans_moons1 <span style=color:#ff79c6>=</span> KMeans(k<span style=color:#ff79c6>=</span><span style=color:#bd93f9>5</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>)
+</span></span><span style=display:flex><span>kmeans_moons1<span style=color:#ff79c6>.</span>fit(X_moons1)
+</span></span><span style=display:flex><span>adjusted_rand_score(y_moons1, kmeans_moons1<span style=color:#ff79c6>.</span>predict(X_moons1))
+</span></span></code></pre></div><pre><code>0.2683287347260544
+</code></pre><p><strong>Houston we have a problem!</strong></p><p>O víes de aprendizado dos algorítmos baseados em protótipos não é adequado para esses problemas cujos clusters não são convexos e nem hiper-esféricos. De fato, o k-Means pode ser visto como um caso especial de <em>Gaussian Mixture models</em>. Se abstrairmos um pouco, o que estamos fazendo é posicionar funções gaussianas multivariadas nos dados. A média dessas gaussianas é justamente os centróides. Cool, huh?</p><p>Avaliaremos um outro tipo de agrupamento particional para tentar resolver esse problema específico.</p><p><strong>Mas calma!</strong> Não é o fim da linha para o nosso amigo k-Means. Deixo aqui esse <a href=https://pafnuty.wordpress.com/2013/08/14/non-convex-sets-with-k-means-and-hierarchical-clustering/>post</a> que achei muito interessante. O autor demonstra como podemos combinar agrupamento hierárquico (a ser ainda discutido) com o k-Means para lidar com problemas não-convexos.</p><h1 id=2-clustering-particional-densidade>2. Clustering particional: densidade</h1><p><em>Density-based spatial clustering of applications with noise</em> <a href=https://scikit-learn.org/stable/modules/clustering.html#dbscan>(DBSCAN)</a> é um algoritmo para agrupamento de dados que funciona de forma diferente das abordagens que vimos até agora. O DBSCAN não assume nada sobre as estruturas dos clusters nos dados. De fato, para o DBSCAN, clusters são regiões de alta densidade separadas por regiões de baixa densidade, não importando a sua forma. Além disso, prevê a existência de pontos que não pertencem a nenhum dos clusters, em outras palavras, <em>outliers</em>.</p><p>O DBSCAN parte dos seguintes pressupostos principais:</p><ul><li><em>Core points</em>: são pontos em regiões de alta densidade;</li><li><em>Border points</em>: pontos &ldquo;acessíveis&rdquo; através de um <em>core</em> point, mas que não são <em>core points</em>.</li><li><em>Noise/Outlier</em>: pontos que não são acessíveis por um ponto <em>core</em>.</li></ul><p>O DBSCAN possui dois hiper-parâmetros:</p><ul><li><code>eps</code>: define um raio de vizinhança, em outras palavras, um ponto $p$ está conectado a outro ponto $q$ se $d(p, q) \le \epsilon$, onde $d$ é uma função de distância (aqui não assumimos nada sobre a métrica de distância utilizada).</li><li><code>min_samples</code>: define quantos pontos devem estar na <code>eps</code>-vizinhança de um ponto, para que tal ponto seja considerado <em>core</em>.</li></ul><p>No entanto, o DBSCAN tem problemas com datasets que possuem muitas variações em densidade e são esparsos. Se os clusters possuem diferentes densidades não será possível se encontrar uma boa combinação de <code>eps</code> e <code>min_samples</code>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>from</span> sklearn.neighbors <span style=color:#ff79c6>import</span> KDTree
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>class</span> <span style=color:#50fa7b>DBSCAN</span>:
+</span></span><span style=display:flex><span>    <span style=color:#ff79c6>def</span> __init__(self, eps<span style=color:#ff79c6>=</span><span style=color:#bd93f9>0.5</span>, min_samples<span style=color:#ff79c6>=</span><span style=color:#bd93f9>4</span>, p<span style=color:#ff79c6>=</span><span style=color:#bd93f9>2</span>):
+</span></span><span style=display:flex><span>        self<span style=color:#ff79c6>.</span>eps <span style=color:#ff79c6>=</span> eps
+</span></span><span style=display:flex><span>        self<span style=color:#ff79c6>.</span>min_samples <span style=color:#ff79c6>=</span> min_samples
+</span></span><span style=display:flex><span>        self<span style=color:#ff79c6>.</span>p <span style=color:#ff79c6>=</span> p  <span style=color:#6272a4># Distância Minkowski</span>
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#ff79c6>def</span> <span style=color:#50fa7b>_minkowski_distance</span>(self, x1, x2):
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>return</span> np<span style=color:#ff79c6>.</span>sum(np<span style=color:#ff79c6>.</span>abs(x1 <span style=color:#ff79c6>-</span> x2) <span style=color:#ff79c6>**</span> self<span style=color:#ff79c6>.</span>p, axis<span style=color:#ff79c6>=</span><span style=color:#bd93f9>1</span>) <span style=color:#ff79c6>**</span> (<span style=color:#bd93f9>1</span> <span style=color:#ff79c6>/</span> self<span style=color:#ff79c6>.</span>p)
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#ff79c6>def</span> <span style=color:#50fa7b>fit</span>(self, X, cycle_callback<span style=color:#ff79c6>=</span><span style=color:#ff79c6>None</span>):
+</span></span><span style=display:flex><span>        <span style=color:#6272a4># Plot inicial vazio</span>
+</span></span><span style=display:flex><span>        p_out <span style=color:#ff79c6>=</span> <span style=color:#ff79c6>None</span>
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#6272a4># Indices na base dados</span>
+</span></span><span style=display:flex><span>        indices <span style=color:#ff79c6>=</span> np<span style=color:#ff79c6>.</span>array(<span style=color:#8be9fd;font-style:italic>range</span>(X<span style=color:#ff79c6>.</span>shape[<span style=color:#bd93f9>0</span>]))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#6272a4># O label de todos os pontos é indefinido</span>
+</span></span><span style=display:flex><span>        self<span style=color:#ff79c6>.</span>labels_ <span style=color:#ff79c6>=</span> np<span style=color:#ff79c6>.</span>full(X<span style=color:#ff79c6>.</span>shape[<span style=color:#bd93f9>0</span>], <span style=color:#ff79c6>-</span><span style=color:#bd93f9>999</span>)
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#6272a4># Faz primeiro plot</span>
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>if</span> cycle_callback <span style=color:#ff79c6>is</span> <span style=color:#ff79c6>not</span> <span style=color:#ff79c6>None</span>:
+</span></span><span style=display:flex><span>            p_out <span style=color:#ff79c6>=</span> cycle_callback(X, self<span style=color:#ff79c6>.</span>labels_, fig<span style=color:#ff79c6>=</span>p_out)
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#6272a4># Core samples</span>
+</span></span><span style=display:flex><span>        self<span style=color:#ff79c6>.</span>core_sample_indices_ <span style=color:#ff79c6>=</span> <span style=color:#8be9fd;font-style:italic>set</span>()
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#6272a4># Estrutura para buscar vizinhos mais próximos</span>
+</span></span><span style=display:flex><span>        kdtree <span style=color:#ff79c6>=</span> KDTree(X, p<span style=color:#ff79c6>=</span>self<span style=color:#ff79c6>.</span>p)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        c <span style=color:#ff79c6>=</span> <span style=color:#bd93f9>0</span>  <span style=color:#6272a4># Id do cluster</span>
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>for</span> i <span style=color:#ff79c6>in</span> <span style=color:#8be9fd;font-style:italic>range</span>(X<span style=color:#ff79c6>.</span>shape[<span style=color:#bd93f9>0</span>]):
+</span></span><span style=display:flex><span>            <span style=color:#6272a4># Já é core point, ponto de borda ou outlier</span>
+</span></span><span style=display:flex><span>            <span style=color:#ff79c6>if</span> self<span style=color:#ff79c6>.</span>labels_[i] <span style=color:#ff79c6>!=</span> <span style=color:#ff79c6>-</span><span style=color:#bd93f9>999</span>:
+</span></span><span style=display:flex><span>                <span style=color:#ff79c6>continue</span>
+</span></span><span style=display:flex><span>            
+</span></span><span style=display:flex><span>            <span style=color:#6272a4># Todos os vizinhos de X_i, com ele incluso no raio eps</span>
+</span></span><span style=display:flex><span>            neighbors <span style=color:#ff79c6>=</span> kdtree<span style=color:#ff79c6>.</span>query_radius(X[i]<span style=color:#ff79c6>.</span>reshape(<span style=color:#bd93f9>1</span>, <span style=color:#ff79c6>-</span><span style=color:#bd93f9>1</span>), r<span style=color:#ff79c6>=</span>self<span style=color:#ff79c6>.</span>eps)[<span style=color:#bd93f9>0</span>]
+</span></span><span style=display:flex><span>            
+</span></span><span style=display:flex><span>            <span style=color:#ff79c6>if</span> <span style=color:#8be9fd;font-style:italic>len</span>(neighbors) <span style=color:#ff79c6>&lt;</span> self<span style=color:#ff79c6>.</span>min_samples: <span style=color:#6272a4># Não é denso o suficiente</span>
+</span></span><span style=display:flex><span>                self<span style=color:#ff79c6>.</span>labels_[i] <span style=color:#ff79c6>=</span> <span style=color:#ff79c6>-</span><span style=color:#bd93f9>1</span>  <span style=color:#6272a4># Noise ou outlier</span>
+</span></span><span style=display:flex><span>                
+</span></span><span style=display:flex><span>                <span style=color:#6272a4># Atualiza plot</span>
+</span></span><span style=display:flex><span>                <span style=color:#ff79c6>if</span> cycle_callback <span style=color:#ff79c6>is</span> <span style=color:#ff79c6>not</span> <span style=color:#ff79c6>None</span>:
+</span></span><span style=display:flex><span>                    p_out <span style=color:#ff79c6>=</span> cycle_callback(X, self<span style=color:#ff79c6>.</span>labels_, fig<span style=color:#ff79c6>=</span>p_out)
+</span></span><span style=display:flex><span>                <span style=color:#ff79c6>continue</span>
+</span></span><span style=display:flex><span>            
+</span></span><span style=display:flex><span>            self<span style=color:#ff79c6>.</span>core_sample_indices_<span style=color:#ff79c6>.</span>add(i)
+</span></span><span style=display:flex><span>            self<span style=color:#ff79c6>.</span>labels_[i] <span style=color:#ff79c6>=</span> c
+</span></span><span style=display:flex><span>            
+</span></span><span style=display:flex><span>            <span style=color:#6272a4># Atualiza plot</span>
+</span></span><span style=display:flex><span>            <span style=color:#ff79c6>if</span> cycle_callback <span style=color:#ff79c6>is</span> <span style=color:#ff79c6>not</span> <span style=color:#ff79c6>None</span>:
+</span></span><span style=display:flex><span>                p_out <span style=color:#ff79c6>=</span> cycle_callback(X, self<span style=color:#ff79c6>.</span>labels_, fig<span style=color:#ff79c6>=</span>p_out)
+</span></span><span style=display:flex><span>            
+</span></span><span style=display:flex><span>            <span style=color:#6272a4># Remove X_i de sua própria vizinhança e define conjunto para expansão</span>
+</span></span><span style=display:flex><span>            seed_set <span style=color:#ff79c6>=</span> neighbors[neighbors <span style=color:#ff79c6>!=</span> i]<span style=color:#ff79c6>.</span>tolist()
+</span></span><span style=display:flex><span>            
+</span></span><span style=display:flex><span>            <span style=color:#6272a4># Agora expandiremos a vizinhança do nosso ponto p</span>
+</span></span><span style=display:flex><span>            <span style=color:#ff79c6>for</span> j <span style=color:#ff79c6>in</span> seed_set:
+</span></span><span style=display:flex><span>                <span style=color:#ff79c6>if</span> self<span style=color:#ff79c6>.</span>labels_[j] <span style=color:#ff79c6>==</span> <span style=color:#ff79c6>-</span><span style=color:#bd93f9>1</span>:  <span style=color:#6272a4># É ruido (até agora)</span>
+</span></span><span style=display:flex><span>                    self<span style=color:#ff79c6>.</span>labels_[j] <span style=color:#ff79c6>=</span> c  <span style=color:#6272a4># Muda ponto previamente considerado ruído</span>
+</span></span><span style=display:flex><span>                    <span style=color:#6272a4># Atualiza plot</span>
+</span></span><span style=display:flex><span>                    <span style=color:#ff79c6>if</span> cycle_callback <span style=color:#ff79c6>is</span> <span style=color:#ff79c6>not</span> <span style=color:#ff79c6>None</span>:
+</span></span><span style=display:flex><span>                        p_out <span style=color:#ff79c6>=</span> cycle_callback(X, self<span style=color:#ff79c6>.</span>labels_, fig<span style=color:#ff79c6>=</span>p_out)
+</span></span><span style=display:flex><span>                
+</span></span><span style=display:flex><span>                <span style=color:#ff79c6>if</span> self<span style=color:#ff79c6>.</span>labels_[j] <span style=color:#ff79c6>!=</span> <span style=color:#ff79c6>-</span><span style=color:#bd93f9>999</span>:
+</span></span><span style=display:flex><span>                    <span style=color:#ff79c6>continue</span>  <span style=color:#6272a4># Ponto já foi processado</span>
+</span></span><span style=display:flex><span>                
+</span></span><span style=display:flex><span>                self<span style=color:#ff79c6>.</span>labels_[j] <span style=color:#ff79c6>=</span> c
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>                <span style=color:#6272a4># Atualiza plot</span>
+</span></span><span style=display:flex><span>                <span style=color:#ff79c6>if</span> cycle_callback <span style=color:#ff79c6>is</span> <span style=color:#ff79c6>not</span> <span style=color:#ff79c6>None</span>:
+</span></span><span style=display:flex><span>                    p_out <span style=color:#ff79c6>=</span> cycle_callback(X, self<span style=color:#ff79c6>.</span>labels_, fig<span style=color:#ff79c6>=</span>p_out)
+</span></span><span style=display:flex><span>                
+</span></span><span style=display:flex><span>                <span style=color:#6272a4># Vamos procurar mais pontos que podem ser acessados por esse elemento</span>
+</span></span><span style=display:flex><span>                <span style=color:#6272a4># conectado ao nosso core point</span>
+</span></span><span style=display:flex><span>                neighbors <span style=color:#ff79c6>=</span> kdtree<span style=color:#ff79c6>.</span>query_radius(X[j]<span style=color:#ff79c6>.</span>reshape(<span style=color:#bd93f9>1</span>, <span style=color:#ff79c6>-</span><span style=color:#bd93f9>1</span>), r<span style=color:#ff79c6>=</span>self<span style=color:#ff79c6>.</span>eps)[<span style=color:#bd93f9>0</span>]
+</span></span><span style=display:flex><span>                
+</span></span><span style=display:flex><span>                <span style=color:#ff79c6>if</span> <span style=color:#8be9fd;font-style:italic>len</span>(neighbors) <span style=color:#ff79c6>&gt;=</span> self<span style=color:#ff79c6>.</span>min_samples:  <span style=color:#6272a4># Também é um core point</span>
+</span></span><span style=display:flex><span>                    seed_set<span style=color:#ff79c6>.</span>extend(neighbors<span style=color:#ff79c6>.</span>tolist())  <span style=color:#6272a4># Adiciona pontos para o seed set</span>
+</span></span><span style=display:flex><span>                    self<span style=color:#ff79c6>.</span>core_sample_indices_<span style=color:#ff79c6>.</span>add(j)
+</span></span><span style=display:flex><span>            
+</span></span><span style=display:flex><span>            c <span style=color:#ff79c6>+=</span> <span style=color:#bd93f9>1</span> <span style=color:#6272a4># Vamos para o próximo cluster!</span>
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#6272a4># Converte para array do numpy (só para ficar parecido com o sklearn)</span>
+</span></span><span style=display:flex><span>        self<span style=color:#ff79c6>.</span>core_sample_indices_ <span style=color:#ff79c6>=</span> np<span style=color:#ff79c6>.</span>array(<span style=color:#8be9fd;font-style:italic>list</span>(self<span style=color:#ff79c6>.</span>core_sample_indices_))
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#6272a4># Vou salvar os core points (só para ficar igual ao sklearn também)</span>
+</span></span><span style=display:flex><span>        self<span style=color:#ff79c6>.</span>components_ <span style=color:#ff79c6>=</span> np<span style=color:#ff79c6>.</span>zeros((<span style=color:#8be9fd;font-style:italic>len</span>(self<span style=color:#ff79c6>.</span>core_sample_indices_), X<span style=color:#ff79c6>.</span>shape[<span style=color:#bd93f9>1</span>]))
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>for</span> i, core_p <span style=color:#ff79c6>in</span> <span style=color:#8be9fd;font-style:italic>enumerate</span>(self<span style=color:#ff79c6>.</span>core_sample_indices_):
+</span></span><span style=display:flex><span>            self<span style=color:#ff79c6>.</span>components_[i] <span style=color:#ff79c6>=</span> X[core_p]
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>return</span> self
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#ff79c6>def</span> <span style=color:#50fa7b>fit_predict</span>(self, X):
+</span></span><span style=display:flex><span>        self<span style=color:#ff79c6>.</span>fit(X)
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>return</span> self<span style=color:#ff79c6>.</span>labels_
+</span></span></code></pre></div><p><strong>Criarei um função diferente para plot, visto as diferenças do algoritmo de clustering</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>def</span> <span style=color:#50fa7b>dbscan_plot_callback_factory</span>(delay<span style=color:#ff79c6>=</span><span style=color:#bd93f9>0.2</span>):
+</span></span><span style=display:flex><span>    <span style=color:#6272a4># Recicla plots para simular animações</span>
+</span></span><span style=display:flex><span>    <span style=color:#ff79c6>def</span> <span style=color:#50fa7b>plot_at_each_cycle</span>(X, labels, fig<span style=color:#ff79c6>=</span><span style=color:#ff79c6>None</span>, delay<span style=color:#ff79c6>=</span>delay):
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>if</span> fig <span style=color:#ff79c6>is</span> <span style=color:#ff79c6>not</span> <span style=color:#ff79c6>None</span>:
+</span></span><span style=display:flex><span>            fig<span style=color:#ff79c6>.</span>axes[<span style=color:#bd93f9>0</span>]<span style=color:#ff79c6>.</span>clear()
+</span></span><span style=display:flex><span>            ax <span style=color:#ff79c6>=</span> fig<span style=color:#ff79c6>.</span>axes[<span style=color:#bd93f9>0</span>]
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>else</span>:
+</span></span><span style=display:flex><span>            fig, ax <span style=color:#ff79c6>=</span> plt<span style=color:#ff79c6>.</span>subplots(figsize<span style=color:#ff79c6>=</span>(<span style=color:#bd93f9>5</span>, <span style=color:#bd93f9>3</span>))
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        label_transformer <span style=color:#ff79c6>=</span> <span style=color:#ff79c6>lambda</span> x: (<span style=color:#f1fa8c>f</span><span style=color:#f1fa8c>&#39;Cluster </span><span style=color:#f1fa8c>{</span>x<span style=color:#f1fa8c>}</span><span style=color:#f1fa8c>&#39;</span> <span style=color:#ff79c6>if</span> x <span style=color:#ff79c6>&gt;=</span> <span style=color:#bd93f9>0</span> <span style=color:#ff79c6>else</span> <span style=color:#f1fa8c>&#39;Noise&#39;</span>) \
+</span></span><span style=display:flex><span>            <span style=color:#ff79c6>if</span> x <span style=color:#ff79c6>&gt;=</span> <span style=color:#ff79c6>-</span><span style=color:#bd93f9>1</span> <span style=color:#ff79c6>else</span> <span style=color:#f1fa8c>&#39;Indefinido&#39;</span>
+</span></span><span style=display:flex><span>        marker_transformer <span style=color:#ff79c6>=</span> <span style=color:#ff79c6>lambda</span> x: (<span style=color:#f1fa8c>&#39;o&#39;</span> <span style=color:#ff79c6>if</span> x <span style=color:#ff79c6>&gt;=</span> <span style=color:#bd93f9>0</span> <span style=color:#ff79c6>else</span> <span style=color:#f1fa8c>&#39;x&#39;</span>) <span style=color:#ff79c6>if</span> x <span style=color:#ff79c6>&gt;=</span> <span style=color:#ff79c6>-</span><span style=color:#bd93f9>1</span> <span style=color:#ff79c6>else</span> <span style=color:#f1fa8c>&#39;.&#39;</span>
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#6272a4># Transforma cluster label em valor que pode mapeado (estou supondo no max 15 clusters)</span>
+</span></span><span style=display:flex><span>        c_normalizer <span style=color:#ff79c6>=</span> matplotlib<span style=color:#ff79c6>.</span>colors<span style=color:#ff79c6>.</span>Normalize(vmin<span style=color:#ff79c6>=</span><span style=color:#bd93f9>0.</span>, vmax<span style=color:#ff79c6>=</span><span style=color:#bd93f9>15</span>)
+</span></span><span style=display:flex><span>        cmap <span style=color:#ff79c6>=</span> matplotlib<span style=color:#ff79c6>.</span>cm<span style=color:#ff79c6>.</span>get_cmap(<span style=color:#f1fa8c>&#39;hsv&#39;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        color_transformer <span style=color:#ff79c6>=</span> <span style=color:#ff79c6>lambda</span> x: ((<span style=color:#bd93f9>.5</span>, <span style=color:#bd93f9>.5</span>, <span style=color:#bd93f9>.5</span>, <span style=color:#bd93f9>1.</span>) <span style=color:#ff79c6>if</span> x <span style=color:#ff79c6>==</span> <span style=color:#ff79c6>-</span><span style=color:#bd93f9>999</span> <span style=color:#ff79c6>else</span> (<span style=color:#bd93f9>0.</span>, <span style=color:#bd93f9>0.</span>, <span style=color:#bd93f9>0.</span>, <span style=color:#bd93f9>1.</span>)) \
+</span></span><span style=display:flex><span>            <span style=color:#ff79c6>if</span> x <span style=color:#ff79c6>&lt;</span> <span style=color:#bd93f9>0</span> <span style=color:#ff79c6>else</span> cmap(c_normalizer(x))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>for</span> label <span style=color:#ff79c6>in</span> np<span style=color:#ff79c6>.</span>unique(labels):
+</span></span><span style=display:flex><span>            imask <span style=color:#ff79c6>=</span> labels <span style=color:#ff79c6>==</span> label
+</span></span><span style=display:flex><span>            colors <span style=color:#ff79c6>=</span> [color_transformer(label) <span style=color:#ff79c6>for</span> _ <span style=color:#ff79c6>in</span> <span style=color:#8be9fd;font-style:italic>range</span>(np<span style=color:#ff79c6>.</span>sum(imask))]
+</span></span><span style=display:flex><span>            ax<span style=color:#ff79c6>.</span>scatter(X[imask, <span style=color:#bd93f9>0</span>], X[imask, <span style=color:#bd93f9>1</span>], label<span style=color:#ff79c6>=</span>label_transformer(label),
+</span></span><span style=display:flex><span>                       marker<span style=color:#ff79c6>=</span>marker_transformer(label), c<span style=color:#ff79c6>=</span>colors)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        ax<span style=color:#ff79c6>.</span>legend(loc<span style=color:#ff79c6>=</span><span style=color:#f1fa8c>&#39;upper left&#39;</span>, bbox_to_anchor<span style=color:#ff79c6>=</span>(<span style=color:#bd93f9>1.05</span>, <span style=color:#bd93f9>1</span>))
+</span></span><span style=display:flex><span>        plt<span style=color:#ff79c6>.</span>tight_layout()
+</span></span><span style=display:flex><span>        plt<span style=color:#ff79c6>.</span>close()
+</span></span><span style=display:flex><span>        <span style=color:#6272a4># Exibe os resultados</span>
+</span></span><span style=display:flex><span>        fig<span style=color:#ff79c6>.</span>show()
+</span></span><span style=display:flex><span>        fig<span style=color:#ff79c6>.</span>canvas<span style=color:#ff79c6>.</span>draw()
+</span></span><span style=display:flex><span>        time<span style=color:#ff79c6>.</span>sleep(delay)
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>return</span> fig
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#ff79c6>return</span> plot_at_each_cycle
+</span></span></code></pre></div><p>Função callback para plot</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>dbscan_callback <span style=color:#ff79c6>=</span> dbscan_plot_callback_factory(<span style=color:#bd93f9>0.2</span>)
+</span></span></code></pre></div><h5 id=dbscan-com-valores-default>DBSCAN com valores default</h5><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib notebook
+</span></span><span style=display:flex><span>plt<span style=color:#ff79c6>.</span>ioff()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>dbscan <span style=color:#ff79c6>=</span> DBSCAN()
+</span></span><span style=display:flex><span>dbscan<span style=color:#ff79c6>.</span>fit(X_toy, cycle_callback<span style=color:#ff79c6>=</span>dbscan_callback)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib inline
+</span></span></code></pre></div><pre><code>&lt;IPython.core.display.Javascript object&gt;
+</code></pre><p>Não deu muito certo. Precisamos ter em mente características dos nossos dados (notem que os ranges dessa base são entre 0 e 1). Vamos tentar outros valores:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib notebook
+</span></span><span style=display:flex><span>plt<span style=color:#ff79c6>.</span>ioff()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>dbscan <span style=color:#ff79c6>=</span> DBSCAN(eps<span style=color:#ff79c6>=</span><span style=color:#bd93f9>0.2</span>)
+</span></span><span style=display:flex><span>dbscan<span style=color:#ff79c6>.</span>fit(X_toy, cycle_callback<span style=color:#ff79c6>=</span>dbscan_callback)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib inline
+</span></span></code></pre></div><pre><code>&lt;IPython.core.display.Javascript object&gt;
+</code></pre><p>Que tal esses?</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib notebook
+</span></span><span style=display:flex><span>plt<span style=color:#ff79c6>.</span>ioff()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>dbscan <span style=color:#ff79c6>=</span> DBSCAN(eps<span style=color:#ff79c6>=</span><span style=color:#bd93f9>0.25</span>)
+</span></span><span style=display:flex><span>dbscan<span style=color:#ff79c6>.</span>fit(X_toy, cycle_callback<span style=color:#ff79c6>=</span>dbscan_callback)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib inline
+</span></span></code></pre></div><pre><code>&lt;IPython.core.display.Javascript object&gt;
+</code></pre><h5 id=dataset-blob>Dataset blob</h5><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>dbscan_callback <span style=color:#ff79c6>=</span> dbscan_plot_callback_factory(<span style=color:#bd93f9>0.</span>)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib notebook
+</span></span><span style=display:flex><span>plt<span style=color:#ff79c6>.</span>ioff()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>dbscan <span style=color:#ff79c6>=</span> DBSCAN()
+</span></span><span style=display:flex><span>dbscan<span style=color:#ff79c6>.</span>fit(X_blob1, cycle_callback<span style=color:#ff79c6>=</span>dbscan_callback)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib inline
+</span></span></code></pre></div><pre><code>&lt;IPython.core.display.Javascript object&gt;
+</code></pre><p>Let&rsquo;s try again</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib notebook
+</span></span><span style=display:flex><span>plt<span style=color:#ff79c6>.</span>ioff()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>dbscan <span style=color:#ff79c6>=</span> DBSCAN(min_samples<span style=color:#ff79c6>=</span><span style=color:#bd93f9>3</span>)
+</span></span><span style=display:flex><span>dbscan<span style=color:#ff79c6>.</span>fit(X_blob1, cycle_callback<span style=color:#ff79c6>=</span>dbscan_callback)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib inline
+</span></span></code></pre></div><pre><code>&lt;IPython.core.display.Javascript object&gt;
+</code></pre><p>Vamos tentar a outra variação que criamos para esse dataset</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib notebook
+</span></span><span style=display:flex><span>plt<span style=color:#ff79c6>.</span>ioff()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>dbscan <span style=color:#ff79c6>=</span> DBSCAN()
+</span></span><span style=display:flex><span>dbscan<span style=color:#ff79c6>.</span>fit(X_blob2, cycle_callback<span style=color:#ff79c6>=</span>dbscan_callback)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib inline
+</span></span></code></pre></div><pre><code>&lt;IPython.core.display.Javascript object&gt;
+</code></pre><p>Está melhor.</p><p>Vamos supor que nesse dataset nós esperaramos encontrar quatro grupos (sabemos as características do problema) e estamos percebendo muitos ruídos. Podemos tentar aumentar o valor de <code>eps</code>:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib notebook
+</span></span><span style=display:flex><span>plt<span style=color:#ff79c6>.</span>ioff()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>dbscan <span style=color:#ff79c6>=</span> DBSCAN(eps<span style=color:#ff79c6>=</span><span style=color:#bd93f9>0.7</span>)
+</span></span><span style=display:flex><span>dbscan<span style=color:#ff79c6>.</span>fit(X_blob2, cycle_callback<span style=color:#ff79c6>=</span>dbscan_callback)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib inline
+</span></span></code></pre></div><pre><code>&lt;IPython.core.display.Javascript object&gt;
+</code></pre><p>A escolha de hiperparâmetros parece uma tarefa um pouco mais complicada nesse caso (e ainda temos o auxilio das visualizações). Escolher o <code>k</code> do k-Means foi muito mais fácil nesses casos!</p><h2 id=21-usando-o-dbscan-em-geometrias-não-convexas>2.1 Usando o DBSCAN em geometrias não-convexas</h2><p>Como será que o DBSCAN se sai nos casos onde o k-Means teve suas dificuldades?</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib notebook
+</span></span><span style=display:flex><span>plt<span style=color:#ff79c6>.</span>ioff()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>dbscan <span style=color:#ff79c6>=</span> DBSCAN()
+</span></span><span style=display:flex><span>dbscan<span style=color:#ff79c6>.</span>fit(X_circ1, cycle_callback<span style=color:#ff79c6>=</span>dbscan_callback)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib inline
+</span></span></code></pre></div><pre><code>&lt;IPython.core.display.Javascript object&gt;
+</code></pre><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib notebook
+</span></span><span style=display:flex><span>plt<span style=color:#ff79c6>.</span>ioff()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>dbscan <span style=color:#ff79c6>=</span> DBSCAN(eps<span style=color:#ff79c6>=</span><span style=color:#bd93f9>0.15</span>, p<span style=color:#ff79c6>=</span><span style=color:#bd93f9>1</span>, min_samples<span style=color:#ff79c6>=</span><span style=color:#bd93f9>6</span>)
+</span></span><span style=display:flex><span>dbscan<span style=color:#ff79c6>.</span>fit(X_circ2, cycle_callback<span style=color:#ff79c6>=</span>dbscan_callback)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib inline
+</span></span></code></pre></div><p>(variei muito os hiperparâmetros até chegar nisso)</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib notebook
+</span></span><span style=display:flex><span>plt<span style=color:#ff79c6>.</span>ioff()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>from</span> sklearn.preprocessing <span style=color:#ff79c6>import</span> StandardScaler
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>dbscan <span style=color:#ff79c6>=</span> DBSCAN()
+</span></span><span style=display:flex><span>dbscan<span style=color:#ff79c6>.</span>fit(StandardScaler()<span style=color:#ff79c6>.</span>fit_transform(X_moons1), cycle_callback<span style=color:#ff79c6>=</span>dbscan_callback)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>%</span>matplotlib inline
+</span></span></code></pre></div><pre><code>&lt;IPython.core.display.Javascript object&gt;
+</code></pre><p>No fim das contas, tudo é uma questão de boas escolhas :D</p><h2 id=22-como-escolher-os-valores-de-eps-e-min_samples>2.2 Como escolher os valores de <code>eps</code> e <code>min_samples</code></h2><p>Essa não é uma resposta trivial. Recentemente, os autores do algoritmo publicaram um <a href=https://www.ccs.neu.edu/home/vip/teach/DMcourse/2_cluster_EM_mixt/notes_slides/revisitofrevisitDBSCAN.pdf>artigo</a> revisitando vários pontos do DBSCAN e discutem algumas possíveis formas de se escolher os seus parâmetros.</p><ul><li><code>min_samples</code>: uma <em>&ldquo;thumb rule&rdquo;</em> para selecionar esse hiper-parâmetro é <code>2 * n_features</code>. Notem que o valor padrão é <code>4</code> e estamos utilizando exemplos bi-dimensionais. No entanto, para datasets muito grandes, com muitas features, ou com muito ruído, é uma boa ideia mudar os valores desse parâmetro.</li><li><code>eps</code>: esse hiper-parâmetro é mais complicado de ser ajustado e também depende da função de distância utilizada. Idealmente ele deve ser o menor possível e deveria ser ajustado com base em um especialista do domínio. Por exemplo, se estamos agrupando dados de GPS, um especialista poderia nos dizer que a distância de 1km deveria ligar dois pontos. Nesse caso, pode ser válido ajustar também o valore de <code>min_samples</code>. Os autores do DBSCAN aconselham deixar um dos hiper-parâmetros livres. Existem heurísticas parecidas com a do &ldquo;cotovelo&rdquo;, mas não são tão triviais como no caso do k-Means.</li></ul><p>Em geral, ao explorarmos valores de hiper-parâmetros:</p><ul><li><p>Não queremos que muitos pontos sejam marcados como ruído:</p><ul><li>Os autores do DBSCAN afirmam que um valor adequado de instâncias identificadas como ruído está entre $1%$ e $30%$</li></ul></li><li><p>Se o maior componente (cluster) tem muitos dados (entre $20%$ até $50%$), isso pode ser um indício de que o valor de <code>eps</code> escolhido está muito alto. Nesse caso, os autores apontam dois caminhos:</p><ul><li>Diminuir o valor de <code>eps</code></li><li>Utilizar uma abordagem modificada do DBSCAN que utilizam hierarquias: OPTICS e HDBSCAN. Ambos esses algoritmos estão disponíveis no <code>sklearn</code>.</li></ul></li></ul><p>De fato, a <a href=https://scikit-learn.org/stable/modules/clustering.html>seção de clustering</a> do sklearn apresenta vários algoritmos de agrupamento que estão disponíveis, assim como métricas de avaliação, dicas e comparações entre os clusterizadores. Existe, inclusive, uma <a href=https://scikit-learn.org/stable/modules/clustering.html#overview-of-clustering-methods>tabela comparativa</a> dos algorítmos disponíveis apontando casos de uso. Recomendo também a seção 4 do artigo que mencionei anteriormente, dos próprios autores do DBSCAN.</p><h1 id=3-relembrando-as-diferenças>3. Relembrando as diferenças</h1><ul><li><p>Protótipos vs Densidade</p><ul><li>O k-Means e similares utilizam uma noção de um centro, ou ponto representativo do grupo</li><li>O DBSCAN não possui tais noções. Os pontos <em>core</em> não definem um protótipo para o grupo: um mesmo cluster pode possuir vários pontos <em>core</em>.</li></ul></li><li><p>Número de clusters</p><ul><li>O número é pré-definido no k-Means<ul><li>Porém existem várias estratégias para se encontrar valores adequados de k</li><li>Os grupos encontrados são hiper-esféricos</li></ul></li><li>O número é encontrado automaticamente no DBSCAN<ul><li>No entanto, encontrar valores para o seus hiper-parâmetros não é trivial</li><li>Nada é assumido acerca da forma dos grupos</li></ul></li></ul></li><li><p>Ruídos e outliers</p><ul><li>O k-Means é sensível a ruídos e outliers (esses tipo de dados podem deslocar os centros)</li><li>O DBSCAN prevê a existência de ruídos nos dados (o algorítmo deve estar bem ajustado para que funcione bem)</li></ul></li><li><p>Inicialização</p><ul><li>O resultado do k-Means depende de sua inicialização</li><li>O DBSCAN é determinístico</li></ul></li></ul><h3 id=para-uso-em-emergências>Para uso em emergências:</h3><p>Executa as porções essenciais do código caso algum problema ocorra. Evita que seja necessário rodar todas as animações sequencialmente.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span><span style=color:#ff79c6>%%</span>javascript
+</span></span><span style=display:flex><span>Jupyter.notebook.execute_cells([<span style=color:#bd93f9>0</span>, <span style=color:#bd93f9>3</span>, <span style=color:#bd93f9>4</span>, <span style=color:#bd93f9>5</span>, <span style=color:#bd93f9>7</span>, <span style=color:#bd93f9>37</span>, <span style=color:#bd93f9>40</span>, <span style=color:#bd93f9>44</span>, <span style=color:#bd93f9>47</span>, <span style=color:#bd93f9>50</span>, <span style=color:#bd93f9>58</span>, <span style=color:#bd93f9>65</span>, <span style=color:#bd93f9>73</span>, <span style=color:#bd93f9>78</span>, <span style=color:#bd93f9>86</span>,
+</span></span><span style=display:flex><span>                                <span style=color:#bd93f9>92</span>, <span style=color:#bd93f9>105</span>, <span style=color:#bd93f9>109</span>, <span style=color:#bd93f9>115</span>, <span style=color:#bd93f9>126</span>, <span style=color:#bd93f9>128</span>, <span style=color:#bd93f9>138</span>])
+</span></span></code></pre></div></p></div></div></main><footer class=footer><span>&copy; 2022 Saulo Martiello Mastelini</span></footer></body></html>
