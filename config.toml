@@ -6,6 +6,8 @@ title = "Saulo Martiello Mastelini"
 
 enableEmoji = true
 enableRobotsTXT = true
+
+PygmentsCodeFences = true
 pygmentsStyle = "dracula"
 
 [menu]
@@ -83,12 +85,7 @@ accentColor = "#FF4D4D"
 
 # You can use this to inject any HTML in the <head> tag.
 # Ideal usecase for this is to import custom js/css or add your analytics snippet
-# customHeadHTML = """
-#   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-#   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-#   <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-#   <link rel="manifest" href="site.webmanifest">
-# """
+# customHeadHTML = ""
 
 # Keywords relevant for SEO
 metaKeywords = ["blog", "river-ml", "machine-learning", "online-machine-learning", "regression"]
