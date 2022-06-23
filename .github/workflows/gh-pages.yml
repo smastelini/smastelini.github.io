@@ -27,5 +27,3 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./public
-          user_name: smastelini
-          user_email: saulomastelini@gmail.com
