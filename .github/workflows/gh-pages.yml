@@ -1,10 +1,8 @@
-name: github pages
-
+name: github-pages
 on:
   push:
     branches:
       - main  # Set a branch to deploy
-
 jobs:
   deploy:
     runs-on: ubuntu-20.04
@@ -29,3 +27,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./public
+          external_repository: smastelini/smastelini.github.io
+          user_name: smastelini
+          user_email: saulomastelini@gmail.com
+          publish_branch: main
