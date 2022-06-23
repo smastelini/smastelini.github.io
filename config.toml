@@ -1,15 +1,12 @@
 baseURL = "https://smastelini.github.io/"
 defaultContentLanguage = "en"
-languageCode = "en"
+languageCode = "en-us"
 title = "Saulo Martiello Mastelini"
 theme = "gokarna"
-encoding = "UTF-8"
 
-# Emoji support
 enableEmoji = true
-# Automatically generate robots.txt
 enableRobotsTXT = true
-
+pygmentsUseClasses = true
 pygmentsStyle = "dracula"
 
 [menu]
@@ -114,3 +111,7 @@ pygmentsStyle = "dracula"
     {name = "applemusic", url = "https://music.apple.com/profile/mastelini"},
     {name = "instagram", url = "https://www.instagram.com/smastelini"},
   ]
+
+[author]
+  email = "saulomastelini@gmail.com"
+  name = "Saulo Martiello Mastelini"
