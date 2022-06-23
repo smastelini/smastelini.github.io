@@ -101,6 +101,7 @@ footer = "Saulo Martiello Mastelini"
 socialIcons = [
   {name = "googlescholar", url = "https://scholar.google.com.br/citations?user=eBtNmMEAAAAJ"},
   {name = "linkedin", url = "https://www.linkedin.com/in/smastelini"},
+  {name = "researchgate", url = "https://www.researchgate.net/profile/Saulo-Mastelini"},
   {name = "orcid", url = "https://orcid.org/0000-0002-0092-3572"},
   {name = "medium", url = "https://medium.com/@saulomastelini"},
   {name = "applemusic", url = "https://music.apple.com/profile/mastelini"},
