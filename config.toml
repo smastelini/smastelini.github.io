@@ -1,4 +1,4 @@
-baseURL = "http://smastelini.github.io/"
+baseURL = "https://smastelini.github.io/"
 defaultContentLanguage = "en"
 languageCode = "en"
 title = "Saulo Martiello Mastelini"
@@ -22,18 +22,15 @@ pygmentsStyle = "dracula"
   [[menu.main]]
     # Unique identifier for a menu item
     identifier = "posts"
-
     url = "/posts/"
-    
+  
     # You can add extra information before the name (HTML format is supported), such as icons
     #pre = ""
-
     # You can add extra information after the name (HTML format is supported), such as icons
     #post = ""
 
     # Display name
     name = "Posts"
-
     # Weights are used to determine the ordering
     weight = 2
   
