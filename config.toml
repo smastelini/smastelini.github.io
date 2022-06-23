@@ -1,117 +1,117 @@
 baseURL = "https://smastelini.github.io/"
 defaultContentLanguage = "en"
 languageCode = "en-us"
-title = "Saulo Martiello Mastelini"
 theme = "gokarna"
+title = "Saulo Martiello Mastelini"
 
 enableEmoji = true
 enableRobotsTXT = true
-pygmentsUseClasses = true
 pygmentsStyle = "dracula"
+pygmentsUseClasses = true
 
 [menu]
-  [[menu.main]]
-    identifier = "about"
-    name = "About"
-    url = "/about/"
-    weight = 1
+[[menu.main]]
+identifier = "about"
+name = "About"
+url = "/about/"
+weight = 1
 
-  [[menu.main]]
-    # Unique identifier for a menu item
-    identifier = "posts"
-    url = "/posts/"
-  
-    # You can add extra information before the name (HTML format is supported), such as icons
-    #pre = ""
-    # You can add extra information after the name (HTML format is supported), such as icons
-    #post = ""
+[[menu.main]]
+# Unique identifier for a menu item
 
-    # Display name
-    name = "Posts"
-    # Weights are used to determine the ordering
-    weight = 2
-  
-  [[menu.main]]
-    # Unique identifier for a menu item
-    identifier = "links"
-    url = "/links/"
-    name = "Links"
-    weight = 3
+identifier = "posts"
+url = "/posts/"
+# You can add extra information before the name (HTML format is supported), such as icons
+#pre = ""
+# You can add extra information after the name (HTML format is supported), such as icons
+#post = ""
 
-  [[menu.main]]
-    identifier = "cv"
-    url = "/pdf/cv-mastelini.pdf"
-    name = "CV"
-    weight = 4
+# Display name
+name = "Posts"
+# Weights are used to determine the ordering
 
-  [[menu.main]]
-    identifier = "contact"
-    url = "mailto:saulomastelini@gmail.com"
-    name = "Contact me"
-    weight = 5
+weight = 2
+[[menu.main]]
+# Unique identifier for a menu item
+identifier = "links"
+name = "Links"
+url = "/links/"
+weight = 3
 
-  [[menu.main]]
-    identifier = "tags"
-    name = "Tags"
-    url = "/tags/"
-    weight = 6
-    
-  [[menu.main]]
-    identifier = "github"
-    url = "https://github.com/smastelini/"
-    weight = 7
+[[menu.main]]
+identifier = "cv"
+name = "CV"
+url = "/pdf/cv-mastelini.pdf"
+weight = 4
 
-    pre = "<span data-feather='github'></span>"
-  
-  [[menu.main]]
-    identifier = "linkedin"
-    url = "https://www.linkedin.com/in/smastelini/"
-    weight = 8
+[[menu.main]]
+identifier = "contact"
+name = "Contact me"
+url = "mailto:saulomastelini@gmail.com"
+weight = 5
 
-    pre = "<span data-feather='linkedin'></span>"
+[[menu.main]]
+
+identifier = "tags"
+name = "Tags"
+url = "/tags/"
+weight = 6
+[[menu.main]]
+identifier = "github"
+url = "https://github.com/smastelini/"
+weight = 7
+
+
+pre = "<span data-feather='github'></span>"
+[[menu.main]]
+identifier = "linkedin"
+url = "https://www.linkedin.com/in/smastelini/"
+weight = 8
+
+pre = "<span data-feather='linkedin'></span>"
 
 [params]
-  # URL for the avatar on homepage
-  avatarURL = "images/avatar.jpg"
+# URL for the avatar on homepage
+avatarURL = "images/avatar.jpg"
 
-  # Choose one of size-xs, size-s, size-m, size-l & size-xl. (Default: size-m)
-  avatarSize = "size-xl"
+# Choose one of size-xs, size-s, size-m, size-l & size-xl. (Default: size-m)
+avatarSize = "size-xl"
 
-  # Description to display on homepage
-  description = "Countryside boy dabbling in the world of online machine learning"
+# Description to display on homepage
+description = "Countryside boy dabbling in the world of online machine learning"
 
-  # Accent color is displayed when you hover over <a> tags
-  accentColor = "#FF4D4D"
+# Accent color is displayed when you hover over <a> tags
+accentColor = "#FF4D4D"
 
-  # You can use this to inject any HTML in the <head> tag.
-  # Ideal usecase for this is to import custom js/css or add your analytics snippet
-  # customHeadHTML = """
-  #   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-  #   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-  #   <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-  #   <link rel="manifest" href="site.webmanifest">
-  # """
+# You can use this to inject any HTML in the <head> tag.
+# Ideal usecase for this is to import custom js/css or add your analytics snippet
+# customHeadHTML = """
+#   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+#   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+#   <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+#   <link rel="manifest" href="site.webmanifest">
+# """
 
-  # Keywords relevant for SEO
-  metaKeywords = ["blog", "river-ml", "machine-learning", "online-machine-learning", "regression"]
+# Keywords relevant for SEO
+metaKeywords = ["blog", "river-ml", "machine-learning", "online-machine-learning", "regression"]
 
-  # If you want to display posts on the homepage, the options are
-  # "popular" (order posts by weight), "recent" (order posts by date)
-  # or "" (do not display, default option)
-  # showPostsOnHomePage = ""
+# If you want to display posts on the homepage, the options are
+# "popular" (order posts by weight), "recent" (order posts by date)
+# or "" (do not display, default option)
+# showPostsOnHomePage = ""
 
-  # Footer text
-  footer = "Saulo Martiello Mastelini"
+# Footer text
+footer = "Saulo Martiello Mastelini"
 
-  socialIcons = [
-    {name = "googlescholar", url = "https://scholar.google.com.br/citations?user=eBtNmMEAAAAJ"},
-    {name = "linkedin", url = "https://www.linkedin.com/in/smastelini"},
-    {name = "orcid", url = "https://orcid.org/0000-0002-0092-3572"},
-    {name = "medium", url = "https://medium.com/@saulomastelini"},
-    {name = "applemusic", url = "https://music.apple.com/profile/mastelini"},
-    {name = "instagram", url = "https://www.instagram.com/smastelini"},
-  ]
+socialIcons = [
+  {name = "googlescholar", url = "https://scholar.google.com.br/citations?user=eBtNmMEAAAAJ"},
+  {name = "linkedin", url = "https://www.linkedin.com/in/smastelini"},
+  {name = "orcid", url = "https://orcid.org/0000-0002-0092-3572"},
+  {name = "medium", url = "https://medium.com/@saulomastelini"},
+  {name = "applemusic", url = "https://music.apple.com/profile/mastelini"},
+  {name = "instagram", url = "https://www.instagram.com/smastelini"},
+]
 
 [author]
-  email = "saulomastelini@gmail.com"
-  name = "Saulo Martiello Mastelini"
+email = "saulomastelini@gmail.com"
+name = "Saulo Martiello Mastelini"
