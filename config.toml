@@ -7,7 +7,6 @@ title = "Saulo Martiello Mastelini"
 enableEmoji = true
 enableRobotsTXT = true
 pygmentsStyle = "dracula"
-pygmentsUseClasses = true
 
 [menu]
 [[menu.main]]
