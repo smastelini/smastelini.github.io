@@ -51,7 +51,6 @@ url = "mailto:saulomastelini@gmail.com"
 weight = 5
 
 [[menu.main]]
-
 identifier = "tags"
 name = "Tags"
 url = "/tags/"
@@ -61,8 +60,8 @@ identifier = "github"
 url = "https://github.com/smastelini/"
 weight = 7
 
-
 pre = "<span data-feather='github'></span>"
+
 [[menu.main]]
 identifier = "linkedin"
 url = "https://www.linkedin.com/in/smastelini/"
