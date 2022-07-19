@@ -2,6 +2,7 @@
 title: "Unespecified features and the road so far"
 date: 2022-07-19
 draft: false
+tags: ["regression", "river", "hoeffding-trees"]
 type: "post"
 ---
     
@@ -15,7 +16,7 @@ Some time ago, I came across an [interesting paper](https://arxiv.org/abs/2010.0
 During my time at (the now discontinued) skmultiflow, I always tried to add some commentary to "fuzzy code portions" every time I figured them out. Some key extra functionalities of models, such as Hoeffding Adaptive Trees, not described in the original paper, took me years to understand (more about that later). And I don't judge the developers/researchers by any means. Sometimes we need just a little more time to think about something even better than we had previously thought and published. And not always this "something better" is paper-worthy. That's why I believe Magapragada's paper is really relevant.
 
 
-# 1. My part in the extra tweaks in all these years
+## 1. My part in the extra tweaks in all these years
 
 I'm also to blame for things that are not written anywhere except in the code. In my defense, I always tried to document these things, and I believe they bring something valuable to the end user. Let me list some examples, and later I will talk about something more recent and perhaps more significant I have done. I always wanted to create a record of these things somewhere, but my thesis topic and my current time schedule don't allow me to fit all these tweaks in the formal structure of a research paper. A blog post might fit the bill.
 
@@ -24,13 +25,13 @@ Some models in [River](https://riverml.xyz) have perks you cannot find anywhere 
 Following, I list a somewhat long and tedious list of things I implemented in skmultiflow and River that are not found in research papers. I will not discuss them in depth, as my main objective here is to create a log of unspecified behaviors. If somebody is interested in expanding these points in the form of documentation or even a paper, please e-mail me. We can collaborate on that 🙂.
 
 
-## 1.1. Memory management in Hoeffding Tree regressors
+### 1.1. Memory management in Hoeffding Tree regressors
 
 With the help of professor Bernhard Pfahringer and Jacob Montiel, I adapted the memory management routines proposed by Richard Brendon Kirkby in his [thesis](https://researchcommons.waikato.ac.nz/handle/10289/2568) to Hoeffing Tree (HT) regressors. In the original proposal, Kirkby worked with classification trees and used a distribution impurity heuristic to rank nodes and make the least promising ones stop attempting to split.
 
 In River, regression tree nodes are ranked by their depth, and the deepest ones might get deactivated if the memory limit is reached. By deactivated, I mean they will not be allowed to split and monitor split-enabling statistics to save memory. You can check the PR I created in skmultiflow [here](https://github.com/scikit-multiflow/scikit-multiflow/pull/230).
 
-## 1.2. Attribute splitter improvements
+### 1.2. Attribute splitter improvements
 
 I have simplified the original regression trees' attribute splitter (Extended Binary Search Tree – E-BST) to avoid monitoring redundant target statistics and, thus, saving some memory. This idea is described in the [Ph.D. thesis](http://kt.ijs.si/theses/phd_aljaz_osojnik.pdf) of Aljaž Osojnik. You can check the PR [here](https://github.com/scikit-multiflow/scikit-multiflow/pull/237).
 
@@ -40,13 +41,13 @@ Although these modifications do not change how the trees are used, the models be
 
 As far as I am concerned, HT regressors in MOA do not have the same capabilities.
 
-## 1.3. Adaptive Random Forest regressor tweaks
+### 1.3. Adaptive Random Forest regressor tweaks
 
 With the approval of Heitor Murilo Gomes, I added the option of using the median statistic to aggregate the predictions of individual trees in the Adaptive Random Forest (ARF) regressor (and Streaming Random Patches). In a [paper](https://ieeexplore.ieee.org/abstract/document/9206756) in collaboration with Heitor and other authors, we have found that combining median aggregation with model trees is often beneficial for predictive performance.
 
 In the original MOA code, the raw output of the trees is monitored by the drift detectors, as far as I am concerned. Additionally, the ARF regressor in River monitors the absolute error of individual trees to track concept drifts. I believe that tracking errors make more sense. You can check it yourself and compare the ARF for regression in MOA against the River version. Time differences aside, in my tests, usually River has the edge concerning the predictive performance!
 
-## 1.4. QoL improvements to Hoeffding Trees
+### 1.4. QoL improvements to Hoeffding Trees
 
 Allowing models to grow indefinitely in streaming scenarios is not always a good idea. During the merger of creme and skmultiflow, I made sure all the HT models in River had the option to limit their maximum height. In the case of HT regressors, I also added the option of using adaptive leaf models in single-target regression, just like it was proposed for multi-target trees (in the latter case, adaptive leaf models are described in research papers).
 
@@ -54,13 +55,13 @@ After a long time of dreaming about it, I ensured that the user could use any re
 
 I have always seen HTs' components as lego blocks. You can pick different things and fit them together to build varied stuff. Since my time at skmultiflow and now River, I have done a lot of waves of refactoring to make the original code (ported before my time from MOA) more and more modular. I'm pretty happy with the results and believe the current models are "lego-esque" already. But I still have work to do on that. Someday I might post something further discussing this topic.
 
-## 1.5. Option trees... of sorts
+### 1.5. Option trees... of sorts
 
 Just like it is implemented in MOA (also as an unspecified feature) and described in Manapragada's paper, all Hoeffding Adaptive Trees (HAT) can act like option trees, kind of. HAT creates alternate tree branches every time drift is detected in a subtree. In MOA, if the subtree is big enough, it can contribute to the final predictions, even though the old subtree was not discarded. In other words, MOA's HAT combines the outputs of the main subtree and the alternate one to compose the final class probabilities.
 
 Nonetheless, this only happens if the alternate tree is not composed of a single node, i.e., it has made some splits. This is not detailed in the HAT paper. In River, I have decided to take a different path. River's HAT always combines the predictions of the main tree with the alternate one, even if the alternate tree is simply a leaf. I think the most recent subtree always has something to bring to the table, as it is induced using only the data arriving after the concept drift.
 
-## 1.6. Missing and emerging data in Hoeffding Trees
+### 1.6. Missing and emerging data in Hoeffding Trees
 
 One of the most beautiful things about using dictionaries as the input data format in River is being able to explore sparsity. You should try it!
 
@@ -73,7 +74,7 @@ HTs in River are robust to missing data and emerging features. After some discus
     - Otherwise, we update the split statistics of the leaves.
         
 
-# 2. Hoeffding Adaptive Tree regressor, previously known as my nemesis
+## 2. Hoeffding Adaptive Tree regressor, previously known as my nemesis
 
 When I started collaborating in skmultiflow, I was pretty new to online ML and HTs. By then, I soon discovered something that has haunted me for a long time: the Hoeffding Adaptive Tree regressor.
 
@@ -81,13 +82,13 @@ Let's not rush things so you can understand my point. HAT is a wonder proposed f
 
 And there are even some unspecified extra features I have mentioned before and are better discussed in the paper by Manapragada et al.
 
-## 2.1. HAT in a nutshell:
+### 2.1. HAT in a nutshell:
 
 Each non-leaf node in HAT carries a concept drift detector. If this detector signals a drift at any given time, HAT starts a new subtree rooted at this node. This alternate or background subtree then keeps learning from the new data (after the detected drift) until a user-given threshold is reached. The foreground tree also keeps learning.
 
 After the warm-up period, defined by the threshold aforementioned, HAT compares the foreground subtree against the background one and only keeps the best option. If the background subtree is the best option, it replaces the foreground tree, and the outdated subtree is discarded. If the older subtree still has its mojo, i.e., it is still the most accurate one, the background tree is discarded.
 
-## 2.2. The problem and the elephant in the room
+### 2.2. The problem and the elephant in the room
 
 Here is the thing: the mean of "best" is defined via a statistical test. This literally took me years to figure out. I cannot count how many times I have read the following portion of the HAT classifier code without not getting its meaning ([permalink](https://github.com/online-ml/river/blob/6f390b51b25f87989b463e11bd0460a9bf83e069/river/tree/nodes/hatc_nodes.py#L215-L229)):
 
@@ -128,7 +129,7 @@ Other collaborators and I have fixed the bugs throughout the years. But the spec
 
 Thus, I did my best in these past years to achieve that.
 
-## 2.3. My first attempts
+### 2.3. My first attempts
 
 As I mentioned before, we monitor some type of error to detect drifts. In regression, a usual approach is to rely on absolute errors. Other things could also work, but the point is that these metrics are usually unbounded. The range of the error depends on the input data.
 
@@ -141,7 +142,7 @@ My idea was to assume that the absolute errors passed to the drift detectors fol
 
 Using this interval, $\left[\overline{x} - 3s, \overline{x} + 3s\right]$, we can normalize the errors using a more robust strategy. This strategy indeed can give us fewer false positive drift detections and was used for a long time in River. However, the statistical test assumptions were incorrect. Once I understood that everything made sense!
 
-## 2.4. The current solution
+### 2.4. The current solution
 
 Recently I discovered everything I talked about so far concerning HAT and HATR. Once I got all this matter about performing a statistical test to assess whether the differences between the performances of the foreground and background subtrees were significant, it was only a matter of finding something more appropriate for regression.
 
@@ -175,7 +176,7 @@ For completeness, here is the [code](https://github.com/online-ml/river/blob/6f3
 
 For some extra flavor, besides adding the z-test, I also made the significance level of the subtree switching tests a configurable parameter in both HAT versions. They were hardcoded to $\alpha=0.05$ previously.
 
-# 3. Wrapping up
+## 3. Wrapping up
 
 During my Ph.D. I was lucky to meet wonderful people who helped to figure out many things and maybe contribute somehow to Online ML. Some things take time, and I am happy that many people make open-source tools like River and others better and better.
 
