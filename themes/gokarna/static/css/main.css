@@ -460,6 +460,10 @@ table td {
   margin-right: auto;
 }
 
+.post-content p {
+  text-align: justify;
+}
+
 /* LIST */
 .list-posts .list-title {
   text-align: center;
