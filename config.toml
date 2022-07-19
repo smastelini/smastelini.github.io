@@ -113,7 +113,7 @@ socialIcons = [
   {name = "researchgate", url = "https://www.researchgate.net/profile/Saulo-Mastelini"},
   {name = "orcid", url = "https://orcid.org/0000-0002-0092-3572"},
   {name = "medium", url = "https://medium.com/@saulomastelini"},
-  {name = "applemusic", url = "https://music.apple.com/profile/mastelini"},
+  {name = "spotify", url = "https://open.spotify.com/user/mastelini"},
   {name = "instagram", url = "https://www.instagram.com/smastelini"},
 ]
 
