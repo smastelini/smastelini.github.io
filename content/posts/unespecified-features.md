@@ -119,7 +119,7 @@ It took me eons (and a confirmation e-mail from professor Albert Bifet, which ki
 
 Wait, what?
 
-Well, let me give you a little more context. Most supervised and non-stationary online ML models monitor some type of error to detect concept drifts. In the classification case, the usual strategy is to use a $0-1$ loss. In other words, the drift detector receives $0$ if the node correctly classifies an instance and $1$ otherwise. Therefore, we monitor a random Bernoulli variable. Two variables, if we think about it. One for the foreground tree and another one for the background tree. This $0-1$ loss is precisely what we compare to decide which is the best subtree to keep. Hence, the idea of using a frequentist confidence interval test based on the Hoeffding inequality. I finally got this part after reading [this](https://en.wikipedia.org/w/index.php?title=Hoeffding%27s_inequality&section=6#Confidence_intervals) and spending a lot of time thinking. I just needed four years to understand this idea :sweat_smile:.
+Well, let me give you a little more context. Most supervised and non-stationary online ML models monitor some type of error to detect concept drifts. In the classification case, the usual strategy is to use a \\(0-1\\) loss. In other words, the drift detector receives \\(0\\) if the node correctly classifies an instance and \\(1\\) otherwise. Therefore, we monitor a random Bernoulli variable. Two variables, if we think about it. One for the foreground tree and another one for the background tree. This \\(0-1\\) loss is precisely what we compare to decide which is the best subtree to keep. Hence, the idea of using a frequentist confidence interval test based on the Hoeffding inequality. I finally got this part after reading [this](https://en.wikipedia.org/w/index.php?title=Hoeffding%27s_inequality&section=6#Confidence_intervals) and spending a lot of time thinking. I just needed four years to understand this idea :sweat_smile:.
 
 The HAT authors do not explicitly mention this specific type of test in the paper, but they note that any proper test could be used with HAT. The Hoeffing inequality-based test (using the Bernoulli variable properties) is what made its way into the HAT code. So far, so good. This is what HAT was initially designed for. But there was a problem that haunted me all those years. MOA does not have it; skmultiflow had: Hoeffding Adaptive Tree regressor. I sincerely do not know its origin nor who initially made a tentative implementation of it. The fact is that HATR, let's call it like that, was already in skmultiflow when I arrived and it makes so much sense to exist!
 
@@ -133,20 +133,20 @@ Thus, I did my best in these past years to achieve that.
 
 As I mentioned before, we monitor some type of error to detect drifts. In regression, a usual approach is to rely on absolute errors. Other things could also work, but the point is that these metrics are usually unbounded. The range of the error depends on the input data.
 
-Since I did not know by then that the test used in the HAT classifier and replicated in HATR assumed Bernoulli variables, my first thought was to normalize the error between $0$ and $1$ and use the existing code.
+Since I did not know by then that the test used in the HAT classifier and replicated in HATR assumed Bernoulli variables, my first thought was to normalize the error between \\(0\\) and \\(1\\) and use the existing code.
 
 I've tried different stuff, and Jacob Montiel always kindly listened to my crazy ideas and helped me with them. I tried using an incremental version of min-max scaling, but it generated a lot of false alarms. My second proposal powered HATR for years. 
 
-My idea was to assume that the absolute errors passed to the drift detectors followed a normal distribution. If that were the case, I could push things further and use the empirical rule. This rule says that $99.73\%$ of normally distributed data is between the interval defined by three times the standard deviation ($3 \times s$) around the mean value ($\overline{x}$). Note that I'm using the sample mean and standard deviation.
+My idea was to assume that the absolute errors passed to the drift detectors followed a normal distribution. If that were the case, I could push things further and use the empirical rule. This rule says that \\(99.73\%\\) of normally distributed data is between the interval defined by three times the standard deviation (\\(3 \times s\\)) around the mean value (\\(\overline{x}\\)). Note that I'm using the sample mean and standard deviation.
 
 
-Using this interval, $\left[\overline{x} - 3s, \overline{x} + 3s\right]$, we can normalize the errors using a more robust strategy. This strategy indeed can give us fewer false positive drift detections and was used for a long time in River. However, the statistical test assumptions were incorrect. Once I understood that everything made sense!
+Using this interval, \\(\left[\overline{x} - 3s, \overline{x} + 3s\right]\\), we can normalize the errors using a more robust strategy. This strategy indeed can give us fewer false positive drift detections and was used for a long time in River. However, the statistical test assumptions were incorrect. Once I understood that everything made sense!
 
 ### 2.4. The current solution
 
 Recently I discovered everything I talked about so far concerning HAT and HATR. Once I got all this matter about performing a statistical test to assess whether the differences between the performances of the foreground and background subtrees were significant, it was only a matter of finding something more appropriate for regression.
 
-After some research, I decided to give a z-test a try. Why z-test? Well, it sounded generic and straightforward enough. Again, we assume the distributions are normally distributed (which sounds reasonable since we are monitoring errors and there are plenty of observations). By default, the threshold to define the warm-up period before testing for statistically significant performance differences is $300$. This value comes from the original HAT. So, three hundred error observations for each contender (foreground and background subtrees) sounds reasonable.
+After some research, I decided to give a z-test a try. Why z-test? Well, it sounded generic and straightforward enough. Again, we assume the distributions are normally distributed (which sounds reasonable since we are monitoring errors and there are plenty of observations). By default, the threshold to define the warm-up period before testing for statistically significant performance differences is \\(300\\). This value comes from the original HAT. So, three hundred error observations for each contender (foreground and background subtrees) sounds reasonable.
 
 And that's it. No more range limitations, mysterious formulae/code, and try/excepts!
 
@@ -174,9 +174,9 @@ For completeness, here is the [code](https://github.com/online-ml/river/blob/6f3
                     # From here, we select the best subtree to keep
 ```
 
-For some extra flavor, besides adding the z-test, I also made the significance level of the subtree switching tests a configurable parameter in both HAT versions. They were hardcoded to $\alpha=0.05$ previously.
+For some extra flavor, besides adding the z-test, I also made the significance level of the subtree switching tests a configurable parameter in both HAT versions. They were hardcoded to \\(\alpha=0.05\\) previously.
 
-## 3. Wrapping up
+# 3. Wrapping up
 
 During my Ph.D. I was lucky to meet wonderful people who helped to figure out many things and maybe contribute somehow to Online ML. Some things take time, and I am happy that many people make open-source tools like River and others better and better.
 
