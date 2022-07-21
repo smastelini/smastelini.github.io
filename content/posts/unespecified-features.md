@@ -90,7 +90,7 @@ After the warm-up period, defined by the threshold aforementioned, HAT compares 
 
 ### 2.2. The problem and the elephant in the room
 
-Here is the thing: the mean of "best" is defined via a statistical test. This literally took me years to figure out. I cannot count how many times I have read the following portion of the HAT classifier code without not getting its meaning ([permalink](https://github.com/online-ml/river/blob/6f390b51b25f87989b463e11bd0460a9bf83e069/river/tree/nodes/hatc_nodes.py#L215-L229)):
+Here is the thing: the meaning of "best" is defined via a statistical test. This literally took me years to figure out. I cannot count how many times I have read the following portion of the HAT classifier code without not getting its meaning ([permalink](https://github.com/online-ml/river/blob/6f390b51b25f87989b463e11bd0460a9bf83e069/river/tree/nodes/hatc_nodes.py#L215-L229)):
 
 
 ```python
