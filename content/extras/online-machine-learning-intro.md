@@ -29,7 +29,7 @@ Every process takes time. Therefore, a few minutes or hours are not enough to ex
 
 If you want to learn more about the topics discussed in this notebook, I suggest:
 
-- [Knowledge discovery from data streams](http://www.liaad.up.pt/area/jgama/DataStreamsCRC.pdf) by the renowned researcher João Gama, 
+- [Knowledge discovery from data streams](http://www.liaad.up.pt/area/jgama/DataStreamsCRC.pdf) by the renowned researcher professor João Gama, one of the leading online machine learning researchers worldwide.
 - [MOA book](https://moa.cms.waikato.ac.nz/book-html/): an open-access book that discusses a lot of themes related to data streams
 - [River documentation](https://riverml.xyz/): it has plenty of examples, tutorials, and theoretical resources. It is constantly updated and expanded.
 
