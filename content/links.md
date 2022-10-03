@@ -11,6 +11,7 @@ Keep an :eye: here, as I will update this page (hopefully) often to add more stu
 ## In English
 
 - [Slides](/pdf/qo-waikato.pdf) :bar_chart: I presented to the University of Waikato's Online Machine Learning Research Group in 2021. By that time, Heitor Murilo Gomes, Jacob Montiel, and professors Bernhard Pfahringer and Albert Bifet invited me to give a brief virtual presentation of my research to fellow researchers. These slides can be seen as a companion to my [paper](https://www.sciencedirect.com/science/article/pii/S0167865521000520) about that subject.
+- [Online machine learning introduction](../extras/online-machine-learning-intro/) I presented to the bioinformatics research group of KU Leuven KULAK. It is basically an updated and trimmed-down version of my original post in Portuguese. It provides a friendly and not mathematically heavy introduction to the research field, with a practical focus on Python and River.
 
 ## Em Português
 
