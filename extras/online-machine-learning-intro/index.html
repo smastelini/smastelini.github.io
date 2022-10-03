@@ -1,0 +1,688 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{--accent-color:#FF4D4D}</style><title>Non-extensive introduction to Online Machine Learning</title><meta name=description content="Countryside boy dabbling in the world of online machine learning"><meta name=keywords content="blog,river-ml,machine-learning,online-machine-learning,regression"><meta property="og:url" content="https://smastelini.github.io/extras/online-machine-learning-intro/"><meta property="og:type" content="website"><meta property="og:title" content="Non-extensive introduction to Online Machine Learning"><meta property="og:description" content="Countryside boy dabbling in the world of online machine learning"><meta property="og:image" content="images/avatar.jpg"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="Non-extensive introduction to Online Machine Learning"><meta name=twitter:description content="Countryside boy dabbling in the world of online machine learning"><meta property="twitter:domain" content="https://smastelini.github.io/extras/online-machine-learning-intro/"><meta property="twitter:url" content="https://smastelini.github.io/extras/online-machine-learning-intro/"><meta name=twitter:image content="images/avatar.jpg"><link rel=canonical href=https://smastelini.github.io/extras/online-machine-learning-intro/><link rel=stylesheet type=text/css href=https://smastelini.github.io//css/normalize.min.css media=print onload='this.media="all"'><link rel=stylesheet type=text/css href=https://smastelini.github.io//css/main.css><link disabled id=dark-theme rel=stylesheet href=https://smastelini.github.io//css/dark.css><script src=https://smastelini.github.io//js/svg-injector.min.js></script>
+<script src=https://smastelini.github.io//js/feather-icons.min.js></script>
+<script src=https://smastelini.github.io//js/main.js></script>
+<link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css integrity=sha384-Xi8rHCmBmhbuyyhbI88391ZKP2dmfnOl4rT9ZfRI7mLTdk1wblIUnrIq35nqwEvC crossorigin=anonymous><script defer src=https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js integrity=sha384-X/XCfMm41VSsqRNQgDerQczD69XqmjOOOwYQvr/uuC+j4OPoNhVgjdGFwhvN02Ja crossorigin=anonymous></script>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js integrity=sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR crossorigin=anonymous onload=renderMathInElement(document.body)></script></head><body><script type=text/javascript>setThemeByUserPref()</script><header class=header><nav class=header-nav><div class=avatar><a href=https://smastelini.github.io/><img src=https://smastelini.github.io/images/avatar.jpg alt=avatar></a></div><div class=nav-title><a class=nav-brand href=https://smastelini.github.io/>Saulo Martiello Mastelini</a></div><div class=nav-links><div class=nav-link><a href=https://smastelini.github.io/about/>About</a></div><div class=nav-link><a href=https://smastelini.github.io/posts/>Posts</a></div><div class=nav-link><a href=https://smastelini.github.io/links/>Links</a></div><div class=nav-link><a href=https://smastelini.github.io/pdf/cv-mastelini.pdf>CV</a></div><div class=nav-link><a href=mailto:saulomastelini@gmail.com>Contact me</a></div><div class=nav-link><a href=https://smastelini.github.io/tags/>Tags</a></div><div class=nav-link><a href=https://github.com/smastelini/><span data-feather=github></span></a></div><div class=nav-link><a href=https://www.linkedin.com/in/smastelini/><span data-feather=linkedin></span></a></div><span class=nav-icons-divider></span><div class="nav-link dark-theme-toggle"><a><span id=theme-toggle-icon data-feather=moon></span></a></div><div class=nav-link id=hamburger-menu-toggle><a><span data-feather=menu></span></a></div><ul class="nav-hamburger-list visibility-hidden"><li class=nav-item><a href=https://smastelini.github.io/about/>About</a></li><li class=nav-item><a href=https://smastelini.github.io/posts/>Posts</a></li><li class=nav-item><a href=https://smastelini.github.io/links/>Links</a></li><li class=nav-item><a href=https://smastelini.github.io/pdf/cv-mastelini.pdf>CV</a></li><li class=nav-item><a href=mailto:saulomastelini@gmail.com>Contact me</a></li><li class=nav-item><a href=https://smastelini.github.io/tags/>Tags</a></li><li class=nav-item><a href=https://github.com/smastelini/><span data-feather=github></span></a></li><li class=nav-item><a href=https://www.linkedin.com/in/smastelini/><span data-feather=linkedin></span></a></li><li class="nav-item dark-theme-toggle"><a><span id=theme-toggle-icon data-feather=moon></span></a></li></ul></div></nav></header><main id=content><div class="post container"><div class=post-header-section><h1>Non-extensive introduction to Online Machine Learning</h1></div><div class=post-content><p><p><strong>Saulo Martiello Mastelini</strong> (<a href=mailto:saulomastelini@gmail.com>saulomastelini@gmail.com</a>)</p><p>Contact:</p><ul><li><a href=https://smastelini.github.io>Website</a></li><li><a href=https://github.com/smastelini>Github</a></li><li><a href=https://www.linkedin.com/in/smastelini/>Linkedin</a></li><li><a href=https://www.researchgate.net/profile/Saulo-Mastelini>ResearchGate</a></li></ul><p>Copyright (c) 2022</p><hr><p><strong>Disclaimer</strong></p><p>As the title implies, this material is not an extensive introduction to the topic. It is just my humble attempt to present a general overview of decades worth of research in an ever-expanding area.</p><p>Every process takes time. Therefore, a few minutes or hours are not enough to explore a whole research area. The idea is to find the balance between diving too deep into a topic and being too superficial. This hands-on talk is not formal, so feel free to interrupt me and ask questions anytime.</p><hr><p><strong>If you want to explore further</strong></p><p>If you want to learn more about the topics discussed in this notebook, I suggest:</p><ul><li><a href=http://www.liaad.up.pt/area/jgama/DataStreamsCRC.pdf>Knowledge discovery from data streams</a> by the renowned researcher João Gama,</li><li><a href=https://moa.cms.waikato.ac.nz/book-html/>MOA book</a>: an open-access book that discusses a lot of themes related to data streams</li><li><a href=https://riverml.xyz/>River documentation</a>: it has plenty of examples, tutorials, and theoretical resources. It is constantly updated and expanded.</li></ul><p>If you have a specific question that is not covered in the documentation, you can always open a new <em>Discussion</em> on Github. For sure somebody will help you! To do that, you need to head to the <a href=https://github.com/online-ml/river>River</a> repository and find the discussion tab.</p><p>Contributions are always welcome. River is open source and kept by a community. Even though you might not have a technical background, it is always possible to help. Fixing and expanding the documentation is just an example of possible ways to get involved. If you find a bug, please let us know! 😁</p><hr><p><strong>About River</strong></p><p>River is an open-source project focused on online machine learning and stream mining. It is the result of a merger between two preceding open source projects:</p><ul><li>creme</li><li>scikit-multiflow</li></ul><p>creme and scikit-multiflow had a lot of overlap and also different strengths and weaknesses. After a long time of planning and discussing core design aspects, the maintainers of both projects joined forces and created River.</p><p>Hence, River has the best of both worlds and it is the result of years of learned lessons in the preceding tools. River is focused on both researchers and practicioneers. A lot of people help River keep growing, but the core development team is spread between France, New Zealand, Vietnam, and Brazil.</p><hr><h2 id=outline>Outline</h2><ol><li>Online learning? Why?</li><li>Batch vs. Online</li><li>Building blocks: some examples</li><li>Why dictionaries?</li><li>How to evaluate an online machine learning model?<ul><li><code>progressive_val_score</code></li><li>label delay</li></ul></li><li>Concept drift</li><li>Examples of algorithms<ol><li>Classification<ol><li>Hoeffding Tree</li><li>Adaptive Random Forest</li></ol></li><li>Regression<ol><li><strong>Hoeffding Tree</strong></li><li><strong>AMRules</strong></li></ol></li><li>Clustering<ol><li>k-Means</li></ol></li></ol></li></ol><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#6272a4># Necessary packages</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6272a4># !pip install numpy</span>
+</span></span><span style=display:flex><span><span style=color:#6272a4># !pip install scikit-learn</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6272a4># Latest released version</span>
+</span></span><span style=display:flex><span><span style=color:#6272a4># !pip install river</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6272a4># Development version</span>
+</span></span><span style=display:flex><span><span style=color:#6272a4>#!pip install git+https://github.com/online-ml/river --upgrade</span>
+</span></span></code></pre></div><h1 id=1-online-learning-why>1. Online Learning? Why?</h1><p>Q: Why should somebody care about updating models online? What about just training them once and using them?
+A: Well, that is indeed enough for most cases.</p><p>Nonetheless, imagine that:</p><ul><li>The amount of data instances is huge</li><li>It is not possible to store everything</li><li>The available computational power is limited<ul><li>CPUs</li><li>Memory</li><li>Battery</li></ul></li><li>Data is non-stationary and/or evolves through time</li></ul><p>Q: Is it possible to use traditional machine learning in these cases?
+A: Yes!</p><p>One can still use traditional or batch machine learning if:</p><ul><li>Data is stationary, i.e., a sufficiently large sample is enough to achieve generalization</li></ul><p>or</p><ul><li>The speed at which data is produced or collected is not too high<ul><li>In these cases, the batch-incremental approach is a possible solution</li></ul></li></ul><h2 id=11-batch-incremental>1.1 Batch-incremental</h2><p>A batch machine learning model is retrained in this strategy at regular intervals. Hence, we must define a training window by following one among the possible approaches:</p><p><strong>Fonte:</strong> Adapted from:</p><blockquote><p>Carnein, M. and Trautmann, H., 2019. Optimizing data stream representation: An extensive survey on stream clustering algorithms. Business & Information Systems Engineering, 61(3), pp.277-297.</p></blockquote><ul><li><em>Landmarks</em> are the most common choice for batch-incremental applications. The window length is the central concern.<ul><li>The current model may become outdated if the window is too large</li><li>The model may fail to capture the underlying patterns in the data if the window is too small.</li><li>Concept drift is a serious problem<ul><li>Drifts do not typically occur at predefined and regular intervals</li></ul></li></ul></li></ul><p><strong>Attention</strong>: batch-incremental != mini-batch.</p><p>Artificial neural networks can be trained incrementally or progressively, usually relying on mini-batches of data.</p><p>Challenges such as &ldquo;catastrophic forgetting&rdquo; are one of the main concerns tackled in the <strong>continual learning</strong> research field.</p><h2 id=12-it-is-worth-noting>1.2. It is worth noting</h2><p>Data streams are not necessarily, time series.</p><p>Q: What is the difference between data streams and time series?
+A: Data streams do not necessarily have explicit temporal dependencies like time series. For instance, sensor networks.
+- Varying transmission speeds
+- Sensor failure
+- Network expansion
+- And so on&mldr;
+Hence, the arrival order does not matter&mldr; much, but it does</p><h1 id=2-batch-vs-online>2. Batch vs. Online</h1><p>The River website has a nice <a href=https://riverml.xyz/latest/examples/batch-to-online/>tutorial</a> on going from batch to online ML. But let&rsquo;s give a general overview of the differences.</p><p>A typical batch ML evaluation pipeline might look like this:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>from</span> sklearn.datasets <span style=color:#ff79c6>import</span> load_wine
+</span></span><span style=display:flex><span><span style=color:#ff79c6>from</span> sklearn.metrics <span style=color:#ff79c6>import</span> accuracy_score
+</span></span><span style=display:flex><span><span style=color:#ff79c6>from</span> sklearn.model_selection <span style=color:#ff79c6>import</span> KFold
+</span></span><span style=display:flex><span><span style=color:#ff79c6>from</span> sklearn.tree <span style=color:#ff79c6>import</span> DecisionTreeClassifier
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>data <span style=color:#ff79c6>=</span> load_wine()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>X, y <span style=color:#ff79c6>=</span> data<span style=color:#ff79c6>.</span>data, data<span style=color:#ff79c6>.</span>target
+</span></span><span style=display:flex><span>kf <span style=color:#ff79c6>=</span> KFold(shuffle<span style=color:#ff79c6>=</span><span style=color:#ff79c6>True</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>, n_splits<span style=color:#ff79c6>=</span><span style=color:#bd93f9>10</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>accs <span style=color:#ff79c6>=</span> []
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>for</span> train, test <span style=color:#ff79c6>in</span> kf<span style=color:#ff79c6>.</span>split(X):
+</span></span><span style=display:flex><span>    X_tr, X_ts <span style=color:#ff79c6>=</span> X[train], X[test]
+</span></span><span style=display:flex><span>    y_tr, y_ts <span style=color:#ff79c6>=</span> y[train], y[test]
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    dt  <span style=color:#ff79c6>=</span> DecisionTreeClassifier(max_depth<span style=color:#ff79c6>=</span><span style=color:#bd93f9>5</span>, random_state<span style=color:#ff79c6>=</span><span style=color:#bd93f9>93</span>)
+</span></span><span style=display:flex><span>    dt<span style=color:#ff79c6>.</span>fit(X_tr, y_tr)
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    accs<span style=color:#ff79c6>.</span>append(accuracy_score(y_ts, dt<span style=color:#ff79c6>.</span>predict(X_ts)))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#8be9fd;font-style:italic>print</span>(<span style=color:#f1fa8c>f</span><span style=color:#f1fa8c>&#34;Mean accuracy: </span><span style=color:#f1fa8c>{</span><span style=color:#8be9fd;font-style:italic>sum</span>(accs) <span style=color:#ff79c6>/</span> <span style=color:#8be9fd;font-style:italic>len</span>(accs)<span style=color:#f1fa8c>}</span><span style=color:#f1fa8c>&#34;</span>)
+</span></span></code></pre></div><pre><code>Mean accuracy: 0.9045751633986928
+</code></pre><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#8be9fd;font-style:italic>len</span>(X)
+</span></span></code></pre></div><pre><code>178
+</code></pre><p>The dataset is loaded in the memory and entirely available for inspection. The decision tree algorithm is allowed to perform multiple passes over the (training) data. Validation data is never used for training.</p><p>In the end, we might take the complete dataset (training + validation) to build a &ldquo;final model&rdquo;, given that we have already found a good set of hyperparameters. Once trained, this model will be used to predict the types of wine samples.</p><p>Let&rsquo;s see what an online ML evaluation might look like:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>from</span> river <span style=color:#ff79c6>import</span> metrics
+</span></span><span style=display:flex><span><span style=color:#ff79c6>from</span> river <span style=color:#ff79c6>import</span> stream
+</span></span><span style=display:flex><span><span style=color:#ff79c6>from</span> river <span style=color:#ff79c6>import</span> tree
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>acc <span style=color:#ff79c6>=</span> metrics<span style=color:#ff79c6>.</span>Accuracy()
+</span></span><span style=display:flex><span>ht <span style=color:#ff79c6>=</span> tree<span style=color:#ff79c6>.</span>HoeffdingTreeClassifier(max_depth<span style=color:#ff79c6>=</span><span style=color:#bd93f9>5</span>, grace_period<span style=color:#ff79c6>=</span><span style=color:#bd93f9>20</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>for</span> x, y <span style=color:#ff79c6>in</span> stream<span style=color:#ff79c6>.</span>iter_sklearn_dataset(load_wine()):
+</span></span><span style=display:flex><span>    <span style=color:#6272a4># The evaluation metric is evaluated before the model actually learns from the instance</span>
+</span></span><span style=display:flex><span>    acc<span style=color:#ff79c6>.</span>update(y, ht<span style=color:#ff79c6>.</span>predict_one(x))
+</span></span><span style=display:flex><span>    <span style=color:#6272a4># The model is updated one instance at a time</span>
+</span></span><span style=display:flex><span>    ht<span style=color:#ff79c6>.</span>learn_one(x, y)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#8be9fd;font-style:italic>print</span>(<span style=color:#f1fa8c>f</span><span style=color:#f1fa8c>&#34;Accuracy: </span><span style=color:#f1fa8c>{</span>acc<span style=color:#ff79c6>.</span>get()<span style=color:#f1fa8c>}</span><span style=color:#f1fa8c>&#34;</span>)
+</span></span></code></pre></div><pre><code>Accuracy: 0.9269662921348315
+</code></pre><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>x, y
+</span></span></code></pre></div><pre><code>({'alcohol': 14.13,
+  'malic_acid': 4.1,
+  'ash': 2.74,
+  'alcalinity_of_ash': 24.5,
+  'magnesium': 96.0,
+  'total_phenols': 2.05,
+  'flavanoids': 0.76,
+  'nonflavanoid_phenols': 0.56,
+  'proanthocyanins': 1.35,
+  'color_intensity': 9.2,
+  'hue': 0.61,
+  'od280/od315_of_diluted_wines': 1.6,
+  'proline': 560.0},
+ 2)
+</code></pre><p>We process the input data sequentially. Data might be loaded on demand from the disk, a web server, or anywhere.
+Data does not need to fit into the available memory.</p><p>Each instance is first used for testing and then to update the learning model. Everything works in an instance-by-instance regimen.</p><p>If the underlying process is guaranteed to be stationary, we could shuffle the data before passing it to the model.</p><p><strong>Note:</strong> we cannot directly compare both the obtained accuracy values, as the evaluation strategies are not the same.</p><h1 id=3-building-blocks-some-examples>3. Building blocks: some examples</h1><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>import</span> numpy <span style=color:#ff79c6>as</span> np
+</span></span><span style=display:flex><span><span style=color:#ff79c6>from</span> river <span style=color:#ff79c6>import</span> stats
+</span></span></code></pre></div><p>After first glancing at the differences, let&rsquo;s take things slowly and reflect on the building blocks necessary to perform Online Machine Learning.</p><p>Let&rsquo;s suppose we want to keep statistics for continually arriving data. For instance, we want to calculate the mean and variance.</p><p>Time to simulate:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>import</span> random
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>rng <span style=color:#ff79c6>=</span> random<span style=color:#ff79c6>.</span>Random(<span style=color:#bd93f9>42</span>)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>%%</span>time
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>values <span style=color:#ff79c6>=</span> []
+</span></span><span style=display:flex><span>stds_batch <span style=color:#ff79c6>=</span> []
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>for</span> _ <span style=color:#ff79c6>in</span> <span style=color:#8be9fd;font-style:italic>range</span>(<span style=color:#bd93f9>50000</span>):
+</span></span><span style=display:flex><span>    v <span style=color:#ff79c6>=</span> rng<span style=color:#ff79c6>.</span>gauss(<span style=color:#bd93f9>5</span>, <span style=color:#bd93f9>3</span>)
+</span></span><span style=display:flex><span>    values<span style=color:#ff79c6>.</span>append(v)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    stds_batch<span style=color:#ff79c6>.</span>append(np<span style=color:#ff79c6>.</span>std(values, ddof<span style=color:#ff79c6>=</span><span style=color:#bd93f9>1</span>) <span style=color:#ff79c6>if</span> <span style=color:#8be9fd;font-style:italic>len</span>(values) <span style=color:#ff79c6>&gt;</span> <span style=color:#bd93f9>1</span> <span style=color:#ff79c6>else</span> <span style=color:#bd93f9>0</span>)
+</span></span></code></pre></div><pre><code>CPU times: user 35 s, sys: 88.7 ms, total: 35.1 s
+Wall time: 35.1 s
+</code></pre><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>rng <span style=color:#ff79c6>=</span> random<span style=color:#ff79c6>.</span>Random(<span style=color:#bd93f9>42</span>)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>%%</span>time
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>stds_incr <span style=color:#ff79c6>=</span> []
+</span></span><span style=display:flex><span>var <span style=color:#ff79c6>=</span> stats<span style=color:#ff79c6>.</span>Var(ddof<span style=color:#ff79c6>=</span><span style=color:#bd93f9>1</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>for</span> _ <span style=color:#ff79c6>in</span> <span style=color:#8be9fd;font-style:italic>range</span>(<span style=color:#bd93f9>50000</span>):
+</span></span><span style=display:flex><span>    v <span style=color:#ff79c6>=</span> rng<span style=color:#ff79c6>.</span>gauss(<span style=color:#bd93f9>5</span>, <span style=color:#bd93f9>3</span>)
+</span></span><span style=display:flex><span>    var<span style=color:#ff79c6>.</span>update(v)
+</span></span><span style=display:flex><span>    stds_incr<span style=color:#ff79c6>.</span>append(var<span style=color:#ff79c6>.</span>get() <span style=color:#ff79c6>**</span> <span style=color:#bd93f9>0.5</span>)
+</span></span></code></pre></div><pre><code>CPU times: user 57.8 ms, sys: 1.14 ms, total: 58.9 ms
+Wall time: 58.4 ms
+</code></pre><p>A lot faster! But does it work?</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>s_errors <span style=color:#ff79c6>=</span> <span style=color:#bd93f9>0</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>for</span> batch, incr <span style=color:#ff79c6>in</span> <span style=color:#8be9fd;font-style:italic>zip</span>(stds_batch, stds_incr):
+</span></span><span style=display:flex><span>    s_errors <span style=color:#ff79c6>+=</span> (batch <span style=color:#ff79c6>-</span> incr)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>s_errors, s_errors <span style=color:#ff79c6>/</span> <span style=color:#8be9fd;font-style:italic>len</span>(stds_batch)
+</span></span></code></pre></div><pre><code>(-1.4842460593911255e-11, -2.968492118782251e-16)
+</code></pre><p>I hope this is convincing! River&rsquo;s <a href=https://riverml.xyz/dev/api/overview/#stats>stats</a> module has a lot of tools to calculate statistics 🧐</p><p>Many of these things are the building blocks of Online Machine Learning algorithms.</p><hr><p><strong>Practical example: Variance using the Welford algorithm</strong></p><ul><li>We need some variables:<ul><li>$n$: number of observations</li><li>$\overline{x}_n$: the sample mean, after $n$ observations</li><li>$M_{2, n}$: second-order statistic</li></ul></li><li>The variables are initialized as follows:<ul><li>$\overline{x}_{0} \leftarrow 0$</li><li>$M_{2,0} \leftarrow 0$</li></ul></li><li>The variables are updated using the following expressions:<ul><li>$\overline{x}<em>n = \overline{x}</em>{n-1} + \dfrac{x_n - \overline{x}_{n-1}}{n}$</li><li>$M_{2,n} = M_{2,n-1} + (x_n - \overline{x}_{n-1})(x_n - \overline{x}_n)$</li></ul></li><li>The sample variance is obtained using: $s_n^2 = \dfrac{M_{2,n}}{n-1}$, for every $n > 1$</li><li>We also get a robust mean estimator for free! 🤓</li></ul><hr><h1 id=4-why-dictionaries-or-why-using-a-sparse-data-representation>4. Why dictionaries (or why using a sparse data representation)?</h1><p>In River, we use dictionaries as the primary data type.</p><p>Dictionaries:</p><ul><li>Key x value: keys are unique</li><li>Values accessed via keys instead of indices</li><li>Sparse</li><li>There is no explicit ordering</li><li>Dynamic!</li><li>Mixed data types</li></ul><p>Examples:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>from</span> datetime <span style=color:#ff79c6>import</span> datetime
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>x <span style=color:#ff79c6>=</span> {
+</span></span><span style=display:flex><span>    <span style=color:#f1fa8c>&#34;potato&#34;</span>: <span style=color:#bd93f9>3</span>,
+</span></span><span style=display:flex><span>    <span style=color:#f1fa8c>&#34;car&#34;</span>: <span style=color:#bd93f9>2</span>,
+</span></span><span style=display:flex><span>    <span style=color:#f1fa8c>&#34;data&#34;</span>: datetime<span style=color:#ff79c6>.</span>now(),
+</span></span><span style=display:flex><span>    <span style=color:#f1fa8c>&#34;yes_or_no&#34;</span>: <span style=color:#f1fa8c>&#34;yes&#34;</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>x
+</span></span></code></pre></div><pre><code>{'potato': 3,
+ 'car': 2,
+ 'data': datetime.datetime(2022, 10, 3, 17, 39, 41, 659462),
+ 'yes_or_no': 'yes'}
+</code></pre><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>x[<span style=color:#f1fa8c>&#34;one extra&#34;</span>] <span style=color:#ff79c6>=</span> <span style=color:#ff79c6>True</span>
+</span></span><span style=display:flex><span>x
+</span></span></code></pre></div><pre><code>{'potato': 3,
+ 'car': 2,
+ 'data': datetime.datetime(2022, 10, 3, 17, 39, 41, 659462),
+ 'yes_or_no': 'yes',
+ 'one extra': True}
+</code></pre><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>del</span> x[<span style=color:#f1fa8c>&#34;data&#34;</span>]
+</span></span><span style=display:flex><span>x
+</span></span></code></pre></div><pre><code>{'potato': 3, 'car': 2, 'yes_or_no': 'yes', 'one extra': True}
+</code></pre><p><strong>Tip</strong>: dictionaries are very similar to JSON.</p><p>Let&rsquo;s compare dictionaries with the traditional approach, based on arrays:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>data <span style=color:#ff79c6>=</span> load_wine()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>X, y <span style=color:#ff79c6>=</span> data<span style=color:#ff79c6>.</span>data, data<span style=color:#ff79c6>.</span>target
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>X[<span style=color:#bd93f9>0</span>, :], data<span style=color:#ff79c6>.</span>feature_names
+</span></span></code></pre></div><pre><code>(array([1.423e+01, 1.710e+00, 2.430e+00, 1.560e+01, 1.270e+02, 2.800e+00,
+        3.060e+00, 2.800e-01, 2.290e+00, 5.640e+00, 1.040e+00, 3.920e+00,
+        1.065e+03]),
+ ['alcohol',
+  'malic_acid',
+  'ash',
+  'alcalinity_of_ash',
+  'magnesium',
+  'total_phenols',
+  'flavanoids',
+  'nonflavanoid_phenols',
+  'proanthocyanins',
+  'color_intensity',
+  'hue',
+  'od280/od315_of_diluted_wines',
+  'proline'])
+</code></pre><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>y[<span style=color:#bd93f9>0</span>], data<span style=color:#ff79c6>.</span>target_names
+</span></span></code></pre></div><pre><code>(0, array(['class_0', 'class_1', 'class_2'], dtype='&lt;U7'))
+</code></pre><p>We are going to put sklearn to the test.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>X_tr, y_tr <span style=color:#ff79c6>=</span> X[:<span style=color:#ff79c6>-</span><span style=color:#bd93f9>2</span>, :], y[:<span style=color:#ff79c6>-</span><span style=color:#bd93f9>2</span>]
+</span></span><span style=display:flex><span>X_ts, y_ts <span style=color:#ff79c6>=</span> X[<span style=color:#ff79c6>-</span><span style=color:#bd93f9>2</span>:, :], y[<span style=color:#ff79c6>-</span><span style=color:#bd93f9>2</span>:]
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>X_tr<span style=color:#ff79c6>.</span>shape, X_ts<span style=color:#ff79c6>.</span>shape
+</span></span></code></pre></div><pre><code>((176, 13), (2, 13))
+</code></pre><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>from</span> sklearn.naive_bayes <span style=color:#ff79c6>import</span> GaussianNB
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>nb <span style=color:#ff79c6>=</span> GaussianNB()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>nb<span style=color:#ff79c6>.</span>fit(X_tr, y_tr)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>nb<span style=color:#ff79c6>.</span>predict(X_ts)
+</span></span></code></pre></div><pre><code>array([2, 2])
+</code></pre><p>What if one feature was missing?</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>try</span>:
+</span></span><span style=display:flex><span>    nb<span style=color:#ff79c6>.</span>predict(X_ts[:, <span style=color:#bd93f9>1</span>:])
+</span></span><span style=display:flex><span><span style=color:#ff79c6>except</span> ValueError <span style=color:#ff79c6>as</span> error:
+</span></span><span style=display:flex><span>    <span style=color:#8be9fd;font-style:italic>print</span>(error)
+</span></span></code></pre></div><pre><code>X has 12 features, but GaussianNB is expecting 13 features as input.
+</code></pre><p>That type of situation is not uncommon in online scenarios. New sensors appear, some fail, and so on. So we must be able to deal with this kind of situation.</p><p>The majority of the models in River can deal with missing and emerging features! 🎉</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>from</span> river <span style=color:#ff79c6>import</span> naive_bayes
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>gnb <span style=color:#ff79c6>=</span> naive_bayes<span style=color:#ff79c6>.</span>GaussianNB()
+</span></span><span style=display:flex><span>dataset <span style=color:#ff79c6>=</span> stream<span style=color:#ff79c6>.</span>iter_sklearn_dataset(load_wine())
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>rng <span style=color:#ff79c6>=</span> random<span style=color:#ff79c6>.</span>Random(<span style=color:#bd93f9>42</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6272a4># Probability of ignoring a feature</span>
+</span></span><span style=display:flex><span>del_chance <span style=color:#ff79c6>=</span> <span style=color:#bd93f9>0.2</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>n_incomplete <span style=color:#ff79c6>=</span> <span style=color:#bd93f9>0</span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>for</span> i, (x, y) <span style=color:#ff79c6>in</span> <span style=color:#8be9fd;font-style:italic>enumerate</span>(dataset):
+</span></span><span style=display:flex><span>    <span style=color:#ff79c6>if</span> i <span style=color:#ff79c6>==</span> <span style=color:#bd93f9>176</span>:
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>break</span>
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    x_copy <span style=color:#ff79c6>=</span> x<span style=color:#ff79c6>.</span>copy()
+</span></span><span style=display:flex><span>    aux <span style=color:#ff79c6>=</span> <span style=color:#bd93f9>0</span>
+</span></span><span style=display:flex><span>    <span style=color:#ff79c6>for</span> xi <span style=color:#ff79c6>in</span> x:
+</span></span><span style=display:flex><span>        <span style=color:#ff79c6>if</span> rng<span style=color:#ff79c6>.</span>random() <span style=color:#ff79c6>&lt;=</span> del_chance:
+</span></span><span style=display:flex><span>            <span style=color:#ff79c6>del</span> x_copy[xi]
+</span></span><span style=display:flex><span>            aux <span style=color:#ff79c6>=</span> <span style=color:#bd93f9>1</span>
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#6272a4># Update the counter of incomplete instances</span>
+</span></span><span style=display:flex><span>        n_incomplete <span style=color:#ff79c6>+=</span> aux
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    gnb<span style=color:#ff79c6>.</span>learn_one(x_copy, y)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>x, y
+</span></span></code></pre></div><pre><code>({'alcohol': 13.17,
+  'malic_acid': 2.59,
+  'ash': 2.37,
+  'alcalinity_of_ash': 20.0,
+  'magnesium': 120.0,
+  'total_phenols': 1.65,
+  'flavanoids': 0.68,
+  'nonflavanoid_phenols': 0.53,
+  'proanthocyanins': 1.46,
+  'color_intensity': 9.3,
+  'hue': 0.6,
+  'od280/od315_of_diluted_wines': 1.62,
+  'proline': 840.0},
+ 2)
+</code></pre><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>gnb<span style=color:#ff79c6>.</span>predict_proba_one(x)
+</span></span></code></pre></div><pre><code>{0: 2.2901730526820806e-23, 1: 4.523692607178262e-14, 2: 0.9999999999999538}
+</code></pre><p>We are going to explicitly modify this last example:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>x, y <span style=color:#ff79c6>=</span> <span style=color:#8be9fd;font-style:italic>next</span>(dataset)
+</span></span><span style=display:flex><span><span style=color:#8be9fd;font-style:italic>list</span>(x<span style=color:#ff79c6>.</span>keys())
+</span></span></code></pre></div><pre><code>['alcohol',
+ 'malic_acid',
+ 'ash',
+ 'alcalinity_of_ash',
+ 'magnesium',
+ 'total_phenols',
+ 'flavanoids',
+ 'nonflavanoid_phenols',
+ 'proanthocyanins',
+ 'color_intensity',
+ 'hue',
+ 'od280/od315_of_diluted_wines',
+ 'proline']
+</code></pre><p>Firstly, we make a copy and delete some features:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>x_copy <span style=color:#ff79c6>=</span> x<span style=color:#ff79c6>.</span>copy()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>del</span> x_copy[<span style=color:#f1fa8c>&#34;malic_acid&#34;</span>]
+</span></span><span style=display:flex><span><span style=color:#ff79c6>del</span> x_copy[<span style=color:#f1fa8c>&#34;hue&#34;</span>]
+</span></span><span style=display:flex><span><span style=color:#ff79c6>del</span> x_copy[<span style=color:#f1fa8c>&#34;flavanoids&#34;</span>]
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>x_copy
+</span></span></code></pre></div><pre><code>{'alcohol': 14.13,
+ 'ash': 2.74,
+ 'alcalinity_of_ash': 24.5,
+ 'magnesium': 96.0,
+ 'total_phenols': 2.05,
+ 'nonflavanoid_phenols': 0.56,
+ 'proanthocyanins': 1.35,
+ 'color_intensity': 9.2,
+ 'od280/od315_of_diluted_wines': 1.6,
+ 'proline': 560.0}
+</code></pre><p>Will our model work?</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>gnb<span style=color:#ff79c6>.</span>predict_proba_one(x_copy), y
+</span></span></code></pre></div><pre><code>({0: 7.394823717897268e-13, 1: 8.511456030879924e-13, 2: 0.9999999999984084},
+ 2)
+</code></pre><p>What if new features appeared?</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>x[<span style=color:#f1fa8c>&#34;1st extra&#34;</span>] <span style=color:#ff79c6>=</span> <span style=color:#bd93f9>7.89</span>
+</span></span><span style=display:flex><span>x[<span style=color:#f1fa8c>&#34;2nd extra&#34;</span>] <span style=color:#ff79c6>=</span> <span style=color:#bd93f9>2</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>x
+</span></span></code></pre></div><pre><code>{'alcohol': 14.13,
+ 'malic_acid': 4.1,
+ 'ash': 2.74,
+ 'alcalinity_of_ash': 24.5,
+ 'magnesium': 96.0,
+ 'total_phenols': 2.05,
+ 'flavanoids': 0.76,
+ 'nonflavanoid_phenols': 0.56,
+ 'proanthocyanins': 1.35,
+ 'color_intensity': 9.2,
+ 'hue': 0.61,
+ 'od280/od315_of_diluted_wines': 1.6,
+ 'proline': 560.0,
+ '1st extra': 7.89,
+ '2nd extra': 2}
+</code></pre><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>gnb<span style=color:#ff79c6>.</span>learn_one(x, y)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>gnb<span style=color:#ff79c6>.</span>predict_one({<span style=color:#f1fa8c>&#34;1st extra&#34;</span>: <span style=color:#bd93f9>7.8</span>, <span style=color:#f1fa8c>&#34;2nd extra&#34;</span>: <span style=color:#bd93f9>1.5</span>})
+</span></span></code></pre></div><pre><code>1
+</code></pre><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>np<span style=color:#ff79c6>.</span>unique(data<span style=color:#ff79c6>.</span>target, return_counts<span style=color:#ff79c6>=</span><span style=color:#ff79c6>True</span>)
+</span></span></code></pre></div><pre><code>(array([0, 1, 2]), array([59, 71, 48]))
+</code></pre><p>Each model implements different strategies to deal with missing or emerging features.</p><p>In our example, &ldquo;1&rdquo; was the majority class, and so was the prediction of GaussianNB. That is the best it can do since there is not enough information about the new features. But these new features are already part of the model and will be updated with more observations.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>gnb<span style=color:#ff79c6>.</span>gaussians
+</span></span></code></pre></div><pre><code>defaultdict(functools.partial(&lt;class 'collections.defaultdict'&gt;, &lt;class 'river.proba.gaussian.Gaussian'&gt;),
+            {0: defaultdict(river.proba.gaussian.Gaussian,
+                         {'alcohol': 𝒩(μ=13.751, σ=0.434),
+                          'ash': 𝒩(μ=2.473, σ=0.234),
+                          'alcalinity_of_ash': 𝒩(μ=16.896, σ=2.671),
+                          'magnesium': 𝒩(μ=107.082, σ=10.720),
+                          'total_phenols': 𝒩(μ=2.811, σ=0.286),
+                          'flavanoids': 𝒩(μ=2.955, σ=0.367),
+                          'proanthocyanins': 𝒩(μ=1.881, σ=0.399),
+                          'hue': 𝒩(μ=1.077, σ=0.119),
+                          'od280/od315_of_diluted_wines': 𝒩(μ=3.131, σ=0.348),
+                          'malic_acid': 𝒩(μ=1.982, σ=0.661),
+                          'nonflavanoid_phenols': 𝒩(μ=0.288, σ=0.071),
+                          'color_intensity': 𝒩(μ=5.443, σ=1.342),
+                          'proline': 𝒩(μ=1114.224, σ=228.521),
+                          '1st extra': 𝒩(μ=0.000, σ=0.000),
+                          '2nd extra': 𝒩(μ=0.000, σ=0.000)}),
+             1: defaultdict(river.proba.gaussian.Gaussian,
+                         {'alcohol': 𝒩(μ=12.261, σ=0.549),
+                          'ash': 𝒩(μ=2.228, σ=0.334),
+                          'alcalinity_of_ash': 𝒩(μ=20.347, σ=3.468),
+                          'magnesium': 𝒩(μ=94.476, σ=16.685),
+                          'flavanoids': 𝒩(μ=2.040, σ=0.711),
+                          'nonflavanoid_phenols': 𝒩(μ=0.371, σ=0.130),
+                          'color_intensity': 𝒩(μ=3.128, σ=0.905),
+                          'hue': 𝒩(μ=1.065, σ=0.184),
+                          'od280/od315_of_diluted_wines': 𝒩(μ=2.751, σ=0.508),
+                          'malic_acid': 𝒩(μ=1.995, σ=1.083),
+                          'total_phenols': 𝒩(μ=2.288, σ=0.548),
+                          'proanthocyanins': 𝒩(μ=1.687, σ=0.617),
+                          'proline': 𝒩(μ=523.582, σ=169.681),
+                          '1st extra': 𝒩(μ=0.000, σ=0.000),
+                          '2nd extra': 𝒩(μ=0.000, σ=0.000)}),
+             2: defaultdict(river.proba.gaussian.Gaussian,
+                         {'alcohol': 𝒩(μ=13.178, σ=0.544),
+                          'malic_acid': 𝒩(μ=3.375, σ=1.205),
+                          'alcalinity_of_ash': 𝒩(μ=21.650, σ=2.332),
+                          'magnesium': 𝒩(μ=98.128, σ=10.416),
+                          'nonflavanoid_phenols': 𝒩(μ=0.439, σ=0.137),
+                          'proanthocyanins': 𝒩(μ=1.168, σ=0.433),
+                          'color_intensity': 𝒩(μ=7.081, σ=2.336),
+                          'hue': 𝒩(μ=0.687, σ=0.105),
+                          'od280/od315_of_diluted_wines': 𝒩(μ=1.692, σ=0.272),
+                          'proline': 𝒩(μ=620.488, σ=110.735),
+                          'ash': 𝒩(μ=2.451, σ=0.183),
+                          'total_phenols': 𝒩(μ=1.723, σ=0.348),
+                          'flavanoids': 𝒩(μ=0.763, σ=0.276),
+                          '1st extra': 𝒩(μ=7.890, σ=0.000),
+                          '2nd extra': 𝒩(μ=2.000, σ=0.000)})})
+</code></pre><h1 id=5-how-to-evaluate-models>5. How to evaluate models?</h1><p>In every example presented so far, when a new instance arrives, we first make a prediction and then use the new datum to update the model.
+No cross-validation, leave-one-out, and so on.</p><p>This evaluation strategy is close to a real-world scenario: usually, we first get the inputs without labels, and predictions must be made. After some time, class labels arrive.
+In our examples, the label is &ldquo;revealed&rdquo; after the model makes a prediction. A delay exists between predicting and getting the label in an even more realistic evaluation scenario. Sometimes, the label never arrives for some instances.</p><p>We call this type of evaluation strategy <em>progressive validation</em> or <em>prequential</em> evaluation.</p><p>I suggest checking this <a href=https://maxhalford.github.io/blog/online-learning-evaluation/>blog post from Max Halford</a>, for more details on that matter.</p><p>In River, we have a utility function <code>progressive_val_score</code> in the <code>evaluate</code> module that handles all the situations mentioned above.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>from</span> river <span style=color:#ff79c6>import</span> evaluate
+</span></span><span style=display:flex><span><span style=color:#ff79c6>from</span> river <span style=color:#ff79c6>import</span> metrics
+</span></span><span style=display:flex><span><span style=color:#ff79c6>from</span> river.datasets <span style=color:#ff79c6>import</span> synth
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>def</span> <span style=color:#50fa7b>label_delay</span>(x, y):
+</span></span><span style=display:flex><span>    <span style=color:#ff79c6>return</span> rng<span style=color:#ff79c6>.</span>randint(<span style=color:#bd93f9>0</span>, <span style=color:#bd93f9>100</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>rng <span style=color:#ff79c6>=</span> random<span style=color:#ff79c6>.</span>Random(<span style=color:#bd93f9>8</span>)
+</span></span><span style=display:flex><span>dataset <span style=color:#ff79c6>=</span> synth<span style=color:#ff79c6>.</span>RandomRBF(seed_sample<span style=color:#ff79c6>=</span><span style=color:#bd93f9>7</span>, seed_model<span style=color:#ff79c6>=</span><span style=color:#bd93f9>9</span>)
+</span></span><span style=display:flex><span>model <span style=color:#ff79c6>=</span> tree<span style=color:#ff79c6>.</span>HoeffdingTreeClassifier()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6272a4># We can combine metrics using pipeline operators</span>
+</span></span><span style=display:flex><span>metric <span style=color:#ff79c6>=</span> metrics<span style=color:#ff79c6>.</span>Accuracy() <span style=color:#ff79c6>+</span> metrics<span style=color:#ff79c6>.</span>MicroF1() <span style=color:#ff79c6>+</span> metrics<span style=color:#ff79c6>.</span>BalancedAccuracy()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>evaluate<span style=color:#ff79c6>.</span>progressive_val_score(
+</span></span><span style=display:flex><span>    dataset<span style=color:#ff79c6>=</span>dataset<span style=color:#ff79c6>.</span>take(<span style=color:#bd93f9>50000</span>),
+</span></span><span style=display:flex><span>    model<span style=color:#ff79c6>=</span>model,
+</span></span><span style=display:flex><span>    metric<span style=color:#ff79c6>=</span>metric,
+</span></span><span style=display:flex><span>    print_every<span style=color:#ff79c6>=</span><span style=color:#bd93f9>5000</span>,
+</span></span><span style=display:flex><span>    show_memory<span style=color:#ff79c6>=</span><span style=color:#ff79c6>True</span>,
+</span></span><span style=display:flex><span>    show_time<span style=color:#ff79c6>=</span><span style=color:#ff79c6>True</span>,
+</span></span><span style=display:flex><span>    delay<span style=color:#ff79c6>=</span>label_delay
+</span></span><span style=display:flex><span>)
+</span></span></code></pre></div><pre><code>[5,000] Accuracy: 69.65%, MicroF1: 69.65%, BalancedAccuracy: 69.12% – 00:00:00 – 84.73 KB
+[10,000] Accuracy: 72.09%, MicroF1: 72.09%, BalancedAccuracy: 71.42% – 00:00:01 – 90.98 KB
+[15,000] Accuracy: 73.55%, MicroF1: 73.55%, BalancedAccuracy: 73.12% – 00:00:01 – 156.3 KB
+[20,000] Accuracy: 75.62%, MicroF1: 75.62%, BalancedAccuracy: 75.24% – 00:00:02 – 199.85 KB
+[25,000] Accuracy: 78.32%, MicroF1: 78.32%, BalancedAccuracy: 78.01% – 00:00:02 – 243.42 KB
+[30,000] Accuracy: 80.24%, MicroF1: 80.24%, BalancedAccuracy: 80.01% – 00:00:03 – 308.74 KB
+[35,000] Accuracy: 81.68%, MicroF1: 81.68%, BalancedAccuracy: 81.50% – 00:00:03 – 374.06 KB
+[40,000] Accuracy: 82.90%, MicroF1: 82.90%, BalancedAccuracy: 82.74% – 00:00:04 – 439.07 KB
+[45,000] Accuracy: 83.83%, MicroF1: 83.83%, BalancedAccuracy: 83.68% – 00:00:05 – 460.84 KB
+[50,000] Accuracy: 84.60%, MicroF1: 84.60%, BalancedAccuracy: 84.45% – 00:00:05 – 498.76 KB
+
+
+
+
+
+Accuracy: 84.60%, MicroF1: 84.60%, BalancedAccuracy: 84.45%
+</code></pre><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>model<span style=color:#ff79c6>.</span>draw()
+</span></span></code></pre></div><p><img src=output_50_0.svg alt=svg></p><h1 id=6-concept-drift>6. Concept drift</h1><p>One of the main concerns in online machine learning is the fact that data distribution may not be stationary. What does that mean?</p><p>Let&rsquo;s first think about an example of stationary distribution:</p><blockquote><p>Big tech company X released a new neural network for the Y problem with 3 zillion parameters, trained for 6 months using enough energy to power up multiple cities. The training dataset had Z terabytes&mldr;</p></blockquote><p>Well, the data does not change. Linguistic rules (in NLP) or visual semantics don&rsquo;t usually vary or evolve. Everything is static under the same data collection policy.</p><p>A dog will always be a dog. A word has a limited set of synonyms, and so on. The rule of the game does not change. But even in these scenarios, there are exceptions. What if the rules changed?</p><p>These changes or concept drift may occur in real-world problems. For example:</p><p>Consumer buying pattern (toilet paper, masks, and hand sanitizer at the beginning of Covid pandemics);
+Renewable energy production: sunlight and wind are not predictable;
+traffic and routes</p><p>An entire research field in online machine learning is devoted to creating concept drift detectors and learning algorithms capable of adapting to changes in the data distribution.</p><p>I am not an expert on this topic, but I will try to give you a simple example of how to apply a drift detector.</p><p>Let&rsquo;s suppose we have a classification problem and are monitoring our model&rsquo;s predictive performance. We denote by $0$ the cases where the model correctly classifies an instance and by $1$ the misclassifications.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>rng <span style=color:#ff79c6>=</span> random<span style=color:#ff79c6>.</span>Random(<span style=color:#bd93f9>8</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>for</span> _ <span style=color:#ff79c6>in</span> <span style=color:#8be9fd;font-style:italic>range</span>(<span style=color:#bd93f9>10</span>):
+</span></span><span style=display:flex><span>    <span style=color:#8be9fd;font-style:italic>print</span>(rng<span style=color:#ff79c6>.</span>choices([<span style=color:#bd93f9>0</span>, <span style=color:#bd93f9>1</span>], weights<span style=color:#ff79c6>=</span>[<span style=color:#bd93f9>0.7</span>, <span style=color:#bd93f9>0.3</span>])[<span style=color:#bd93f9>0</span>])
+</span></span></code></pre></div><pre><code>0
+1
+0
+1
+0
+0
+1
+0
+0
+0
+</code></pre><p>We can feed these values to a drift detector:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>from</span> river <span style=color:#ff79c6>import</span> drift
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>detector <span style=color:#ff79c6>=</span> drift<span style=color:#ff79c6>.</span>ADWIN(delta<span style=color:#ff79c6>=</span><span style=color:#bd93f9>0.01</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>vals <span style=color:#ff79c6>=</span> rng<span style=color:#ff79c6>.</span>choices([<span style=color:#bd93f9>0</span>, <span style=color:#bd93f9>1</span>], weights<span style=color:#ff79c6>=</span>[<span style=color:#bd93f9>0.7</span>, <span style=color:#bd93f9>0.3</span>], k<span style=color:#ff79c6>=</span><span style=color:#bd93f9>500</span>)
+</span></span><span style=display:flex><span><span style=color:#ff79c6>for</span> i, v <span style=color:#ff79c6>in</span> <span style=color:#8be9fd;font-style:italic>enumerate</span>(vals):
+</span></span><span style=display:flex><span>    detector<span style=color:#ff79c6>.</span>update(v)
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#ff79c6>if</span> detector<span style=color:#ff79c6>.</span>drift_detected:
+</span></span><span style=display:flex><span>        <span style=color:#8be9fd;font-style:italic>print</span>(<span style=color:#f1fa8c>f</span><span style=color:#f1fa8c>&#34;Drift detected: </span><span style=color:#f1fa8c>{</span>i<span style=color:#f1fa8c>}</span><span style=color:#f1fa8c>&#34;</span>)
+</span></span></code></pre></div><p>What if the data distribution changes</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>detector <span style=color:#ff79c6>=</span> drift<span style=color:#ff79c6>.</span>ADWIN(delta<span style=color:#ff79c6>=</span><span style=color:#bd93f9>0.05</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>vals <span style=color:#ff79c6>=</span> rng<span style=color:#ff79c6>.</span>choices([<span style=color:#bd93f9>0</span>, <span style=color:#bd93f9>1</span>], weights<span style=color:#ff79c6>=</span>[<span style=color:#bd93f9>0.7</span>, <span style=color:#bd93f9>0.3</span>], k<span style=color:#ff79c6>=</span><span style=color:#bd93f9>500</span>)
+</span></span><span style=display:flex><span>vals<span style=color:#ff79c6>.</span>extend(rng<span style=color:#ff79c6>.</span>choices([<span style=color:#bd93f9>0</span>, <span style=color:#bd93f9>1</span>], weights<span style=color:#ff79c6>=</span>[<span style=color:#bd93f9>0.2</span>, <span style=color:#bd93f9>0.8</span>], k<span style=color:#ff79c6>=</span><span style=color:#bd93f9>500</span>))
+</span></span><span style=display:flex><span><span style=color:#ff79c6>for</span> i, v <span style=color:#ff79c6>in</span> <span style=color:#8be9fd;font-style:italic>enumerate</span>(vals):
+</span></span><span style=display:flex><span>    detector<span style=color:#ff79c6>.</span>update(v)
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#ff79c6>if</span> detector<span style=color:#ff79c6>.</span>drift_detected:
+</span></span><span style=display:flex><span>        <span style=color:#8be9fd;font-style:italic>print</span>(<span style=color:#f1fa8c>f</span><span style=color:#f1fa8c>&#34;Drift detected: </span><span style=color:#f1fa8c>{</span>i<span style=color:#f1fa8c>}</span><span style=color:#f1fa8c>&#34;</span>)
+</span></span></code></pre></div><pre><code>Drift detected: 575
+</code></pre><p>ADWIN is one of the most utilized drift detectors, but there many other algorithms. Non-supervised, semi-supervised, multivariate, and so on.
+Usually, detectors are used as components of predictive models. Each models applies drift detectors in a different manner.</p><h1 id=7-algorithm-examples>7. Algorithm examples</h1><p>I will present some examples of classification, regression, and clustering algorithms for reference. The API access is always the same, so you can try your luck and check other examples in the documentation.</p><h2 id=71-classification>7.1. Classification</h2><p>Algorithms projected for binary classification can be extended to the multiclass case by relying on the tools available in the <code>multiclass</code> module:</p><ul><li><code>OneVsOneClassifier</code></li><li><code>OneVsRestClassifier</code></li><li><code>OutputCodeClassifier</code></li></ul><p>River also have basics tools to handle multi-output tasks. Any contributions are welcome!</p><h3 id=711-hoeffding-trees>7.1.1. Hoeffding Trees</h3><p>One of the most popular families of online machine learning algorithms. They take this name because the statistical measure called Hoeffding bound is used to define when splits are performed. This heuristic ensures the decisions taken incrementally are similar to those performed by a batch decision tree algorithm.</p><p>There are three main variants of Hoeffding Trees:</p><ul><li>Hoeffding Tree: vanilla version</li><li>Hoeffding Adaptive Tree: adds drift detectors to each decision node. If a drift is detected, a new subtree is trained in the background and eventually may replace the affected tree branch.</li><li>Extremely Fast Decision Tree: quickly deploys splits but later revisits and improves its own decisions.</li></ul><p><strong>Main hyperparameters:</strong></p><ul><li><code>grace_period</code>: the interval between split attempts.</li><li><code>delta</code>: the split significance parameter. The split confidence <code>1 - delta</code>.</li><li><code>max_depth</code>: max height a tree might have.</li></ul><p>I wrote a <a href=https://riverml.xyz/dev/user-guide/on-hoeffding-trees/>tutorial</a> on Hoeffding Trees, where you can find more details about the algorithms.</p><p><strong>Example:</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>from</span> river <span style=color:#ff79c6>import</span> tree
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>dataset <span style=color:#ff79c6>=</span> synth<span style=color:#ff79c6>.</span>RandomRBFDrift(
+</span></span><span style=display:flex><span>    seed_model<span style=color:#ff79c6>=</span><span style=color:#bd93f9>7</span>, seed_sample<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>, change_speed<span style=color:#ff79c6>=</span><span style=color:#bd93f9>0.0001</span>, n_classes<span style=color:#ff79c6>=</span><span style=color:#bd93f9>3</span>,
+</span></span><span style=display:flex><span>)<span style=color:#ff79c6>.</span>take(<span style=color:#bd93f9>15000</span>)
+</span></span><span style=display:flex><span>model <span style=color:#ff79c6>=</span> tree<span style=color:#ff79c6>.</span>HoeffdingAdaptiveTreeClassifier(seed<span style=color:#ff79c6>=</span><span style=color:#bd93f9>42</span>)
+</span></span><span style=display:flex><span>metric <span style=color:#ff79c6>=</span> metrics<span style=color:#ff79c6>.</span>Accuracy()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>evaluate<span style=color:#ff79c6>.</span>progressive_val_score(dataset, model, metric, print_every<span style=color:#ff79c6>=</span><span style=color:#bd93f9>1000</span>, show_memory<span style=color:#ff79c6>=</span><span style=color:#ff79c6>True</span>, show_time<span style=color:#ff79c6>=</span><span style=color:#ff79c6>True</span>)
+</span></span></code></pre></div><pre><code>[1,000] Accuracy: 56.06% – 00:00:00 – 38.11 KB
+[2,000] Accuracy: 56.78% – 00:00:00 – 38.17 KB
+[3,000] Accuracy: 57.42% – 00:00:01 – 38.23 KB
+[4,000] Accuracy: 57.16% – 00:00:01 – 38.23 KB
+[5,000] Accuracy: 56.93% – 00:00:01 – 38.23 KB
+[6,000] Accuracy: 56.68% – 00:00:02 – 68.83 KB
+[7,000] Accuracy: 57.14% – 00:00:02 – 69.7 KB
+[8,000] Accuracy: 58.17% – 00:00:02 – 69.89 KB
+[9,000] Accuracy: 58.65% – 00:00:03 – 70.02 KB
+[10,000] Accuracy: 59.07% – 00:00:03 – 101.2 KB
+[11,000] Accuracy: 59.73% – 00:00:04 – 101.45 KB
+[12,000] Accuracy: 60.14% – 00:00:04 – 101.57 KB
+[13,000] Accuracy: 60.67% – 00:00:04 – 101.7 KB
+[14,000] Accuracy: 60.97% – 00:00:05 – 101.76 KB
+[15,000] Accuracy: 60.94% – 00:00:05 – 132.56 KB
+
+
+
+
+
+Accuracy: 60.94%
+</code></pre><p>We can visualize the tree structure:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>model<span style=color:#ff79c6>.</span>draw()
+</span></span></code></pre></div><p><img src=output_63_0.svg alt=svg></p><p>We can also inspect how decisions are made:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>dataset <span style=color:#ff79c6>=</span> synth<span style=color:#ff79c6>.</span>RandomRBFDrift(
+</span></span><span style=display:flex><span>    seed_model<span style=color:#ff79c6>=</span><span style=color:#bd93f9>7</span>, seed_sample<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>, change_speed<span style=color:#ff79c6>=</span><span style=color:#bd93f9>0.0001</span>, n_classes<span style=color:#ff79c6>=</span><span style=color:#bd93f9>3</span>,
+</span></span><span style=display:flex><span>)<span style=color:#ff79c6>.</span>take(<span style=color:#bd93f9>15000</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>x, y <span style=color:#ff79c6>=</span> <span style=color:#8be9fd;font-style:italic>next</span>(dataset)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#8be9fd;font-style:italic>print</span>(model<span style=color:#ff79c6>.</span>debug_one(x))
+</span></span></code></pre></div><pre><code>4 ≤ 0.44069887341009073
+Class 2:
+	P(0) = 0.1
+	P(1) = 0.4
+	P(2) = 0.5
+</code></pre><h3 id=712-adaptive-random-forest>7.1.2. Adaptive Random Forest</h3><p>Adaptive random forest (ARF) is an incremental version of Random Forests that combines the following ingredients:</p><ul><li>Randomized Hoeffding Trees as base learners</li><li>Drifts detectors for each tree<ul><li>New trees are trained in the background when drifts are detected</li></ul></li><li>Online bagging</li></ul><p>ARFs have all the parameters of HTs and also some extra critical parameters:</p><ul><li><code>warning_detector</code> and <code>drift_detector</code></li><li><code>n_models</code>: the number of trees</li><li><code>max_features</code>: the maximum number of features considered during split attempts at each decision node</li></ul><p><strong>Example:</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>from</span> river <span style=color:#ff79c6>import</span> ensemble
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>dataset <span style=color:#ff79c6>=</span> synth<span style=color:#ff79c6>.</span>RandomRBFDrift(
+</span></span><span style=display:flex><span>    seed_model<span style=color:#ff79c6>=</span><span style=color:#bd93f9>7</span>, seed_sample<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>, change_speed<span style=color:#ff79c6>=</span><span style=color:#bd93f9>0.0001</span>, n_classes<span style=color:#ff79c6>=</span><span style=color:#bd93f9>3</span>,
+</span></span><span style=display:flex><span>)<span style=color:#ff79c6>.</span>take(<span style=color:#bd93f9>15000</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>model <span style=color:#ff79c6>=</span> ensemble<span style=color:#ff79c6>.</span>AdaptiveRandomForestClassifier(seed<span style=color:#ff79c6>=</span><span style=color:#bd93f9>8</span>)
+</span></span><span style=display:flex><span>metric <span style=color:#ff79c6>=</span> metrics<span style=color:#ff79c6>.</span>Accuracy()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>evaluate<span style=color:#ff79c6>.</span>progressive_val_score(dataset, model, metric, print_every<span style=color:#ff79c6>=</span><span style=color:#bd93f9>1000</span>, show_memory<span style=color:#ff79c6>=</span><span style=color:#ff79c6>True</span>, show_time<span style=color:#ff79c6>=</span><span style=color:#ff79c6>True</span>)
+</span></span></code></pre></div><pre><code>[1,000] Accuracy: 65.67% – 00:00:01 – 1.04 MB
+[2,000] Accuracy: 71.39% – 00:00:02 – 1.07 MB
+[3,000] Accuracy: 73.06% – 00:00:03 – 2.27 MB
+[4,000] Accuracy: 74.59% – 00:00:04 – 2.68 MB
+[5,000] Accuracy: 75.98% – 00:00:06 – 3.96 MB
+[6,000] Accuracy: 77.31% – 00:00:07 – 5.13 MB
+[7,000] Accuracy: 77.85% – 00:00:08 – 3.8 MB
+[8,000] Accuracy: 78.22% – 00:00:10 – 5.09 MB
+[9,000] Accuracy: 78.25% – 00:00:11 – 6.41 MB
+[10,000] Accuracy: 78.52% – 00:00:12 – 7 MB
+[11,000] Accuracy: 78.36% – 00:00:14 – 8.38 MB
+[12,000] Accuracy: 78.49% – 00:00:15 – 7.64 MB
+[13,000] Accuracy: 78.58% – 00:00:17 – 8.97 MB
+[14,000] Accuracy: 78.53% – 00:00:18 – 10.32 MB
+[15,000] Accuracy: 78.41% – 00:00:20 – 10.76 MB
+
+
+
+
+
+Accuracy: 78.41%
+</code></pre><h2 id=72-regression>7.2. Regression</h2><p>I will use the same dataset for every regression example:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>def</span> <span style=color:#50fa7b>get_friedman</span>():
+</span></span><span style=display:flex><span>    <span style=color:#ff79c6>return</span> synth<span style=color:#ff79c6>.</span>Friedman(seed<span style=color:#ff79c6>=</span><span style=color:#bd93f9>101</span>)<span style=color:#ff79c6>.</span>take(<span style=color:#bd93f9>20000</span>)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>x, y <span style=color:#ff79c6>=</span> <span style=color:#8be9fd;font-style:italic>next</span>(get_friedman())
+</span></span><span style=display:flex><span>x, y
+</span></span></code></pre></div><pre><code>({0: 0.5811521325045647,
+  1: 0.1947544955341367,
+  2: 0.9652511070611112,
+  3: 0.9239764016767943,
+  4: 0.46713867819697397,
+  5: 0.6634706445300605,
+  6: 0.21452296973796803,
+  7: 0.22169624952624067,
+  8: 0.28852243338125616,
+  9: 0.6924227459953175},
+ 20.0094162975429)
+</code></pre><h3 id=722-hoeffding-tree>7.2.2. Hoeffding Tree</h3><p>(I research this topic)</p><p>We have three main types of HTs for regression tasks:</p><ul><li><code>HoeffdingTreeRegressor</code>: vanilla regressor.</li><li><code>HoeffdingAdaptiveTreeRegressor</code>: the regression counterpart of the adaptive classification tree.</li><li><code>iSOUPTreeRegressor</code>: Hoeffding Tree for multi-target regression tasks</li></ul><p>Besides the parameters presented in the classification version, other important parameters are:</p><ul><li><code>leaf_prediction</code>: the prediction strategy (regression or model tree)</li><li><code>leaf_model</code>: the regression model used in model trees&rsquo; leaves</li><li><code>splitter</code>: the decision split algorithm</li></ul><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>from</span> river <span style=color:#ff79c6>import</span> preprocessing
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#6272a4># We can combine multiple metrics in our report</span>
+</span></span><span style=display:flex><span>metric <span style=color:#ff79c6>=</span> metrics<span style=color:#ff79c6>.</span>MAE() <span style=color:#ff79c6>+</span> metrics<span style=color:#ff79c6>.</span>RMSE() <span style=color:#ff79c6>+</span> metrics<span style=color:#ff79c6>.</span>R2()
+</span></span><span style=display:flex><span>model <span style=color:#ff79c6>=</span> preprocessing<span style=color:#ff79c6>.</span>StandardScaler() <span style=color:#ff79c6>|</span> tree<span style=color:#ff79c6>.</span>HoeffdingTreeRegressor()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>evaluate<span style=color:#ff79c6>.</span>progressive_val_score(
+</span></span><span style=display:flex><span>    dataset<span style=color:#ff79c6>=</span>get_friedman(),
+</span></span><span style=display:flex><span>    model<span style=color:#ff79c6>=</span>model,
+</span></span><span style=display:flex><span>    metric<span style=color:#ff79c6>=</span>metric,
+</span></span><span style=display:flex><span>    show_memory<span style=color:#ff79c6>=</span><span style=color:#ff79c6>True</span>,
+</span></span><span style=display:flex><span>    show_time<span style=color:#ff79c6>=</span><span style=color:#ff79c6>True</span>,
+</span></span><span style=display:flex><span>    print_every<span style=color:#ff79c6>=</span><span style=color:#bd93f9>2000</span>
+</span></span><span style=display:flex><span>)
+</span></span></code></pre></div><pre><code>[2,000] MAE: 2.211476, RMSE: 2.922308, R2: 0.662991 – 00:00:00 – 975.25 KB
+[4,000] MAE: 2.06573, RMSE: 2.711252, R2: 0.706024 – 00:00:00 – 1.57 MB
+[6,000] MAE: 1.97555, RMSE: 2.570947, R2: 0.735164 – 00:00:00 – 2.19 MB
+[8,000] MAE: 1.911936, RMSE: 2.481903, R2: 0.753895 – 00:00:00 – 2.73 MB
+[10,000] MAE: 1.870939, RMSE: 2.424265, R2: 0.766415 – 00:00:01 – 3.27 MB
+[12,000] MAE: 1.834748, RMSE: 2.375678, R2: 0.774293 – 00:00:01 – 3.86 MB
+[14,000] MAE: 1.801622, RMSE: 2.329051, R2: 0.782718 – 00:00:01 – 4.36 MB
+[16,000] MAE: 1.773081, RMSE: 2.292944, R2: 0.790029 – 00:00:02 – 5.11 MB
+[18,000] MAE: 1.751902, RMSE: 2.264719, R2: 0.794645 – 00:00:02 – 6.19 MB
+[20,000] MAE: 1.728428, RMSE: 2.234173, R2: 0.800588 – 00:00:02 – 6.35 MB
+
+
+
+
+
+MAE: 1.728428, RMSE: 2.234173, R2: 0.800588
+</code></pre><p>As usual, we can inspect how decisions are made:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>x, y <span style=color:#ff79c6>=</span> <span style=color:#8be9fd;font-style:italic>next</span>(get_friedman())
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#8be9fd;font-style:italic>print</span>(model<span style=color:#ff79c6>.</span>debug_one(x))
+</span></span></code></pre></div><pre><code>0. Input
+--------
+0: 0.58115 (float)
+1: 0.19475 (float)
+2: 0.96525 (float)
+3: 0.92398 (float)
+4: 0.46714 (float)
+5: 0.66347 (float)
+6: 0.21452 (float)
+7: 0.22170 (float)
+8: 0.28852 (float)
+9: 0.69242 (float)
+
+1. StandardScaler
+-----------------
+0: 0.28929 (float)
+1: -1.07485 (float)
+2: 1.58610 (float)
+3: 1.47168 (float)
+4: -0.11737 (float)
+5: 0.56379 (float)
+6: -0.99330 (float)
+7: -0.96557 (float)
+8: -0.73064 (float)
+9: 0.67069 (float)
+
+2. HoeffdingTreeRegressor
+-------------------------
+3 &gt; -0.1
+1 ≤ -0.8
+3 &gt; 0.6
+0 &gt; -0.9
+4 &gt; -0.9
+2 &gt; -1.1
+1 &gt; -1.5
+Mean: 15.269219 | Var: 8.424779
+
+
+Prediction: 18.29789
+</code></pre><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>model[<span style=color:#ff79c6>-</span><span style=color:#bd93f9>1</span>]<span style=color:#ff79c6>.</span>draw(<span style=color:#bd93f9>3</span>)
+</span></span></code></pre></div><p><img src=output_75_0.svg alt=svg></p><h3 id=723-amrules>7.2.3. AMRules</h3><p>Adaptive Model Rules.</p><p>(I also research this topic)</p><p>Creates decision rules by relying on the Hoeffding Bound. AMRules also has anomaly detection capabilities to &ldquo;skip&rdquo; anomalous training samples.</p><p>It has parameters similar to those of HTs:</p><ul><li><code>n_min</code>: equivalent to <code>grace_period</code></li><li><code>pred_type</code>: equivalent to <code>leaf_prediction</code></li><li><code>pred_model</code>: equivalent to <code>leaf_model</code></li><li><code>splitter</code></li></ul><p>Other important parameters:</p><ul><li><code>m_min</code>: minimum number of instances to observe before detecting anomalies.</li><li><code>drift_detector</code>: the drift detection algorithm used by each rule.</li><li><code>anomaly_threshold</code>: threshold to decide whether or not an instance is anomalous (the smaller the score value, the more anomalous the instance is).</li><li><code>ordered_rule_set</code>: defines whether only the first rule is used for detection (when set to <code>True</code>) or all the rules are used (<code>False</code>).</li></ul><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>from</span> river <span style=color:#ff79c6>import</span> rules
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>metric <span style=color:#ff79c6>=</span> metrics<span style=color:#ff79c6>.</span>MAE() <span style=color:#ff79c6>+</span> metrics<span style=color:#ff79c6>.</span>RMSE() <span style=color:#ff79c6>+</span> metrics<span style=color:#ff79c6>.</span>R2()
+</span></span><span style=display:flex><span>model <span style=color:#ff79c6>=</span> preprocessing<span style=color:#ff79c6>.</span>StandardScaler() <span style=color:#ff79c6>|</span> rules<span style=color:#ff79c6>.</span>AMRules(
+</span></span><span style=display:flex><span>    splitter<span style=color:#ff79c6>=</span>tree<span style=color:#ff79c6>.</span>splitter<span style=color:#ff79c6>.</span>TEBSTSplitter(digits<span style=color:#ff79c6>=</span><span style=color:#bd93f9>1</span>),  <span style=color:#6272a4>#  &lt;- this is part of my research</span>
+</span></span><span style=display:flex><span>    drift_detector<span style=color:#ff79c6>=</span>drift<span style=color:#ff79c6>.</span>ADWIN(),
+</span></span><span style=display:flex><span>    ordered_rule_set<span style=color:#ff79c6>=</span><span style=color:#ff79c6>False</span>,
+</span></span><span style=display:flex><span>    m_min<span style=color:#ff79c6>=</span><span style=color:#bd93f9>100</span>,
+</span></span><span style=display:flex><span>    delta<span style=color:#ff79c6>=</span><span style=color:#bd93f9>0.01</span>
+</span></span><span style=display:flex><span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>evaluate<span style=color:#ff79c6>.</span>progressive_val_score(
+</span></span><span style=display:flex><span>    dataset<span style=color:#ff79c6>=</span>get_friedman(),
+</span></span><span style=display:flex><span>    model<span style=color:#ff79c6>=</span>model,
+</span></span><span style=display:flex><span>    metric<span style=color:#ff79c6>=</span>metric,
+</span></span><span style=display:flex><span>    show_memory<span style=color:#ff79c6>=</span><span style=color:#ff79c6>True</span>,
+</span></span><span style=display:flex><span>    show_time<span style=color:#ff79c6>=</span><span style=color:#ff79c6>True</span>,
+</span></span><span style=display:flex><span>    print_every<span style=color:#ff79c6>=</span><span style=color:#bd93f9>2000</span>
+</span></span><span style=display:flex><span>)
+</span></span></code></pre></div><pre><code>[2,000] MAE: 2.751126, RMSE: 3.585212, R2: 0.492754 – 00:00:00 – 557.26 KB
+[4,000] MAE: 2.594004, RMSE: 3.401369, R2: 0.537321 – 00:00:00 – 0.98 MB
+[6,000] MAE: 2.440782, RMSE: 3.200783, R2: 0.589509 – 00:00:00 – 1.06 MB
+[8,000] MAE: 2.35917, RMSE: 3.094535, R2: 0.617403 – 00:00:01 – 1.08 MB
+[10,000] MAE: 2.320284, RMSE: 3.045013, R2: 0.631478 – 00:00:01 – 1.29 MB
+[12,000] MAE: 2.280378, RMSE: 2.994163, R2: 0.641474 – 00:00:01 – 1.18 MB
+[14,000] MAE: 2.257398, RMSE: 2.963653, R2: 0.648179 – 00:00:02 – 1.51 MB
+[16,000] MAE: 2.267085, RMSE: 2.982856, R2: 0.644666 – 00:00:02 – 1.92 MB
+[18,000] MAE: 2.272122, RMSE: 2.98515, R2: 0.643212 – 00:00:03 – 2.08 MB
+[20,000] MAE: 2.26724, RMSE: 2.983389, R2: 0.644419 – 00:00:03 – 2.18 MB
+
+
+
+
+
+MAE: 2.26724, RMSE: 2.983389, R2: 0.644419
+</code></pre><p>We can also inspect the model:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>x, y <span style=color:#ff79c6>=</span> <span style=color:#8be9fd;font-style:italic>next</span>(get_friedman())
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#8be9fd;font-style:italic>print</span>(model<span style=color:#ff79c6>.</span>debug_one(x))
+</span></span><span style=display:flex><span><span style=color:#8be9fd;font-style:italic>print</span>(<span style=color:#f1fa8c>f</span><span style=color:#f1fa8c>&#34;True label: </span><span style=color:#f1fa8c>{</span>y<span style=color:#f1fa8c>}</span><span style=color:#f1fa8c>&#34;</span>)
+</span></span></code></pre></div><pre><code>0. Input
+--------
+0: 0.58115 (float)
+1: 0.19475 (float)
+2: 0.96525 (float)
+3: 0.92398 (float)
+4: 0.46714 (float)
+5: 0.66347 (float)
+6: 0.21452 (float)
+7: 0.22170 (float)
+8: 0.28852 (float)
+9: 0.69242 (float)
+
+1. StandardScaler
+-----------------
+0: 0.28929 (float)
+1: -1.07485 (float)
+2: 1.58610 (float)
+3: 1.47168 (float)
+4: -0.11737 (float)
+5: 0.56379 (float)
+6: -0.99330 (float)
+7: -0.96557 (float)
+8: -0.73064 (float)
+9: 0.67069 (float)
+
+2. AMRules
+----------
+Default rule triggered:
+	Prediction (adaptive): 17.4743
+
+
+Prediction: 17.47431
+True label: 20.0094162975429
+</code></pre><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>x_scaled <span style=color:#ff79c6>=</span> model[<span style=color:#f1fa8c>&#34;StandardScaler&#34;</span>]<span style=color:#ff79c6>.</span>transform_one(x)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>model[<span style=color:#f1fa8c>&#34;AMRules&#34;</span>]<span style=color:#ff79c6>.</span>anomaly_score(x_scaled)
+</span></span></code></pre></div><pre><code>(-0.22130561042509, 0.0, 0)
+</code></pre><h2 id=73-clustering>7.3. Clustering</h2><p>Incremental algorithms must adapt to changes in the data. For instance, new clusters might appear, some might disappear. I will show one example of algorithm:</p><h3 id=731-k-means>7.3.1. k-Means</h3><p>There are multiple incremental versions of k-Means out there. The version available in River adds a parameter called <code>halflife</code> which controls the the intensity of the incremental updates.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#ff79c6>from</span> river <span style=color:#ff79c6>import</span> cluster
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>metric <span style=color:#ff79c6>=</span> metrics<span style=color:#ff79c6>.</span>Silhouette()
+</span></span><span style=display:flex><span>model <span style=color:#ff79c6>=</span> cluster<span style=color:#ff79c6>.</span>KMeans(seed<span style=color:#ff79c6>=</span><span style=color:#bd93f9>7</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>for</span> x, _ <span style=color:#ff79c6>in</span> get_friedman():
+</span></span><span style=display:flex><span>    metric<span style=color:#ff79c6>.</span>update(x, model<span style=color:#ff79c6>.</span>predict_one(x), model<span style=color:#ff79c6>.</span>centers)
+</span></span><span style=display:flex><span>    model<span style=color:#ff79c6>.</span>learn_one(x)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#8be9fd;font-style:italic>print</span>(metric<span style=color:#ff79c6>.</span>get())
+</span></span></code></pre></div><pre><code>0.24465881722583005
+</code></pre><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>metric <span style=color:#ff79c6>=</span> metrics<span style=color:#ff79c6>.</span>Silhouette()
+</span></span><span style=display:flex><span>model <span style=color:#ff79c6>=</span> cluster<span style=color:#ff79c6>.</span>KMeans(n_clusters<span style=color:#ff79c6>=</span><span style=color:#bd93f9>3</span>, seed<span style=color:#ff79c6>=</span><span style=color:#bd93f9>7</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>for</span> x, _ <span style=color:#ff79c6>in</span> get_friedman():
+</span></span><span style=display:flex><span>    metric<span style=color:#ff79c6>.</span>update(x, model<span style=color:#ff79c6>.</span>predict_one(x), model<span style=color:#ff79c6>.</span>centers)
+</span></span><span style=display:flex><span>    model<span style=color:#ff79c6>.</span>learn_one(x)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#8be9fd;font-style:italic>print</span>(metric<span style=color:#ff79c6>.</span>get())
+</span></span></code></pre></div><pre><code>0.6612806222738018
+</code></pre><p>And increase the <code>halflife</code> value.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>metric <span style=color:#ff79c6>=</span> metrics<span style=color:#ff79c6>.</span>Silhouette()
+</span></span><span style=display:flex><span>model <span style=color:#ff79c6>=</span> cluster<span style=color:#ff79c6>.</span>KMeans(n_clusters<span style=color:#ff79c6>=</span><span style=color:#bd93f9>3</span>, seed<span style=color:#ff79c6>=</span><span style=color:#bd93f9>7</span>, halflife<span style=color:#ff79c6>=</span><span style=color:#bd93f9>0.7</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#ff79c6>for</span> x, _ <span style=color:#ff79c6>in</span> get_friedman():
+</span></span><span style=display:flex><span>    metric<span style=color:#ff79c6>.</span>update(x, model<span style=color:#ff79c6>.</span>predict_one(x), model<span style=color:#ff79c6>.</span>centers)
+</span></span><span style=display:flex><span>    model<span style=color:#ff79c6>.</span>learn_one(x)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#8be9fd;font-style:italic>print</span>(metric<span style=color:#ff79c6>.</span>get())
+</span></span></code></pre></div><pre><code>0.7161109032425856
+</code></pre><h1 id=wrapping-up>Wrapping up</h1><p>We can go much deeper into online machine learning solutions. There are multiple strategies to combine models, selecting the best model among a set thereof, and many other aspects. Online hyperparameter tuning is also an exciting research area.</p><p>I strongly suggest checking these additional resources to learn more about online machine learning:</p><p><strong>Tutorials:</strong></p><ul><li><a href=https://riverml.xyz/latest/examples/the-art-of-using-pipelines/>The art of using pipelines</a></li><li><a href=https://riverml.xyz/dev/examples/imbalanced-learning/>Working with imbalanced data</a></li><li><a href=https://riverml.xyz/dev/examples/debugging-a-pipeline/>Debbuging a pipeline</a></li></ul><p><strong>Resource hub:</strong></p><ul><li><a href=https://github.com/online-ml/awesome-online-machine-learning>Awesome online machine learning</a></li></ul><hr><p>Thank you so much for having me!</p><p>Do you have any questions?</p></p></div></div></main><footer class=footer><span>&copy; 2022 Saulo Martiello Mastelini</span></footer></body></html>
