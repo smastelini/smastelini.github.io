@@ -5,7 +5,7 @@ draft: false
 tags: ["regression", "river", "hoeffding-trees"]
 type: "post"
 ---
-    
+
 Maintaining a machine learning (ML) library sometimes makes you make tough decisions and take audacious paths. Those are the perks of creating something so close to research. Being a full-time ML researcher, I got used to the "rules of the game." We do a literature review, find a good research gap, create relevant research questions, and develop some hypotheses. Then it is a matter of structuring your methodological setup to evaluate the proposed solutions. Sometimes we delve into theoretical stuff. Sometimes it is more empirical. If everything goes well, we write a manuscript that gets accepted after some time. And that is pretty much it. Do it again and again.
 
 However, practice and theory not always are on good terms. Writing and testing code is usually more dynamic than the publishing process I described before. In (online) ML, there are so many details in an algorithm that perhaps they cannot fit in the paper format. Maybe they even should not. I really don't have a definitive answer to that.
@@ -35,7 +35,7 @@ In River, regression tree nodes are ranked by their depth, and the deepest ones 
 
 I have simplified the original regression trees' attribute splitter (Extended Binary Search Tree – E-BST) to avoid monitoring redundant target statistics and, thus, saving some memory. This idea is described in the [Ph.D. thesis](http://kt.ijs.si/theses/phd_aljaz_osojnik.pdf) of Aljaž Osojnik. You can check the PR [here](https://github.com/scikit-multiflow/scikit-multiflow/pull/237).
 
-In this same PR, I also brought to life the memory management routine proposed in the [original paper](https://kt.ijs.si/elena_ikonomovska/DAMI10.pdf) about HT regressors, authored by Ikonomovska et al. The original proposal was based on the inefficient version of E-BST, so I had to modify the algorithm slightly to work with the optimized E-BST version. 
+In this same PR, I also brought to life the memory management routine proposed in the [original paper](https://kt.ijs.si/elena_ikonomovska/DAMI10.pdf) about HT regressors, authored by Ikonomovska et al. The original proposal was based on the inefficient version of E-BST, so I had to modify the algorithm slightly to work with the optimized E-BST version.
 
 Although these modifications do not change how the trees are used, the models become faster and more lightweight "for free." The plus side: there are no impacts on the predictive performance.
 
@@ -72,13 +72,13 @@ HTs in River are robust to missing data and emerging features. After some discus
 3. **New categorical value:**
     - If this feature is used in a split, we add a new branch for the new value;
     - Otherwise, we update the split statistics of the leaves.
-        
+
 
 ## 2. Hoeffding Adaptive Tree regressor, previously known as my nemesis
 
 When I started collaborating in skmultiflow, I was pretty new to online ML and HTs. By then, I soon discovered something that has haunted me for a long time: the Hoeffding Adaptive Tree regressor.
 
-Let's not rush things so you can understand my point. HAT is a wonder proposed for classification proposed by [Bifet and Gavalda](https://link.springer.com/chapter/10.1007/978-3-642-03915-7_22) quite some time ago. It shares the basic HT framework with plenty of trees, but some essential differences exist. These differences allow HAT to leverage the best from HTs and tackle their primary weakness: the inability to deal with non-stationary distributions.
+Let's not rush things so you can understand my point. HAT is a wonder proposed for classification by [Bifet and Gavalda](https://link.springer.com/chapter/10.1007/978-3-642-03915-7_22) quite some time ago. It shares the basic HT framework with plenty of trees, but some essential differences exist. These differences allow HAT to leverage the best from HTs and tackle their primary weakness: the inability to deal with non-stationary distributions.
 
 And there are even some unspecified extra features I have mentioned before and are better discussed in the paper by Manapragada et al.
 
@@ -135,9 +135,9 @@ As I mentioned before, we monitor some type of error to detect drifts. In regres
 
 Since I did not know by then that the test used in the HAT classifier and replicated in HATR assumed Bernoulli variables, my first thought was to normalize the error between \\(0\\) and \\(1\\) and use the existing code.
 
-I've tried different stuff, and Jacob Montiel always kindly listened to my crazy ideas and helped me with them. I tried using an incremental version of min-max scaling, but it generated a lot of false alarms. My second proposal powered HATR for years. 
+I've tried different stuff, and Jacob Montiel always kindly listened to my crazy ideas and helped me with them. I tried using an incremental version of min-max scaling, but it generated a lot of false alarms. My second proposal powered HATR for years.
 
-My idea was to assume that the absolute errors passed to the drift detectors followed a normal distribution. If that were the case, I could push things further and use the empirical rule. This rule says that \\(99.73\%\\) of normally distributed data is between the interval defined by three times the standard deviation (\\(3 \times s\\)) around the mean value (\\(\overline{x}\\)). Note that I'm using the sample mean and standard deviation.
+My idea was to assume that the absolute errors passed to the drift detectors followed a normal distribution. If that were the case, I could push things further and use the empirical rule. This rule says that \\(99.73%\\) of normally distributed data is between the interval defined by three times the standard deviation (\\(3 \times s\\)) around the mean value (\\(\overline{x}\\)). Note that I'm using the sample mean and standard deviation.
 
 
 Using this interval, \\(\left[\overline{x} - 3s, \overline{x} + 3s\right]\\), we can normalize the errors using a more robust strategy. This strategy indeed can give us fewer false positive drift detections and was used for a long time in River. However, the statistical test assumptions were incorrect. Once I understood that everything made sense!
@@ -157,17 +157,14 @@ For completeness, here is the [code](https://github.com/online-ml/river/blob/6f3
                 alt_mean_er = self._alternate_tree._error_tracker.mean.get()
                 cur_mean_er = self._error_tracker.mean.get()
 
-
                 # Variance of the prediction error
                 alt_s2_er = self._alternate_tree._error_tracker.get()
                 cur_s2_er = self._error_tracker.get()
-
 
                 # Perform z-test to determine whether mean errors are significantly different
                 z = (alt_mean_er - cur_mean_er) / math.sqrt(alt_s2_er / alt_n + cur_s2_er / cur_n)
                 # We double the p-value due to the double-tailed test
                 p_value = 2.0 * tree._norm_dist.cdf(-abs(z))
-
 
                 # The mean errors are significantly different accordingly to the z-test
                 if p_value <= tree.switch_significance:

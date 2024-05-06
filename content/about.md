@@ -22,17 +22,16 @@ I started my Master's in 2016 at the same university. In the beginning, I intend
 
 In 2018, I moved to [São Carlos](https://en.wikipedia.org/wiki/S%C3%A3o_Carlos) to start my Ph.D. under the supervision of professor [André Carlos Ponce de Leon Ferreira de Carvalho](https://www.linkedin.com/in/andr%C3%A9-carlos-ponce-de-leon-f-de-carvalho-151bb26) in the Institute of Mathematics and Computer Science (ICMC) from the [University of São Paulo (USP)](https://www5.usp.br/). My research is supported :dollar_banknote: by [FAPESP](https://fapesp.br/en). At ICMC, I once again found a wonderful and chaotic (in a good sense) workplace! I made a lot of new friends that I keep, in the same way as the ones from UEL, to this day.
 
-My central research theme is online machine learning regression, primarily using decision trees :seedling: and rules :straight_ruler:. Specifically, my thesis goal :light_bulb: is to make existing online regressors more efficient regarding memory and running time while keeping their predictive performance! During my Ph.D., I started collaborating with the `scikit-multiflow` project and ended up becoming one of its maintainers. In 2020, the core developers from `scikit-multiflow` and `creme` joined forces to create [River](https://riverml.xyz) :ocean:! So, I am a proud founding member and maintainer of the to-go library on online machine learning in Python!
+My central research theme is online machine learning regression, primarily using decision trees :seedling: and rules :straight_ruler:. Specifically, my thesis goal :light_bulb: was to make existing online regressors more efficient regarding memory and running time while keeping their predictive performance! During my Ph.D., I started collaborating with the `scikit-multiflow` project and ended up becoming one of its maintainers. In 2020, the core developers from `scikit-multiflow` and `creme` joined forces to create [River](https://riverml.xyz) :ocean:! So, I am a proud founding member and maintainer of the to-go library on online machine learning in Python!
 
-From February 2022 to September 2022, I am living in Europe :european_union: as a visiting researcher at [INESC-TEC](https://www.inesctec.pt/en)/[University of Porto](https://sigarra.up.pt/up/en/WEB_BASE.GERA_PAGINA?p_pagina=home)! My current research goal is to build :wrench: more efficient online k-Nearest Neighbor algorithms under a sliding-window regimen. Let's see how that goes!
+From February 2022 to September 2022, I lived in Europe :european_union: as a visiting researcher at [INESC-TEC](https://www.inesctec.pt/en)/[University of Porto](https://sigarra.up.pt/up/en/WEB_BASE.GERA_PAGINA?p_pagina=home)! My goal at the time was to build :wrench: more efficient online k-Nearest Neighbor algorithms under a sliding-window regimen. The resulting paper concerning that research was published on Elsevier's Information Fusion!
 
 ---
 
-I love dogs :dog:, reading :book:, playing guitar :guitar: and singing :musical_note:, doing some trekking :mountain: and spending time with people I love :heart:! I formulated some of my best ideas and proposals in a mountain or amidst trees :evergreen_tree:. 
+I love dogs :dog:, reading :book:, playing guitar :guitar: and singing :musical_note:, doing some trekking :mountain: and spending time with people I love :heart:! I formulated some of my best ideas and proposals in a mountain or amidst trees :evergreen_tree:.
 
 You can e-mail me at [saulomastelini@gmail](mailto:saulomastelini@gmail.com) if you want to get in touch :handshake:!
 
 
 ![Me at Louvre](/images/louvre.jpg)
 *This is me at the Louvre museum! Despite this picture, taking selfies is not among my hobbies* :smile:
-
