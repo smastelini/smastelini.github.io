@@ -12,7 +12,7 @@ Keep an :eye: here, as I will update this page (hopefully) often to add more stu
 
 - [Slides](/pdf/qo-waikato.pdf) :bar_chart: I presented to the University of Waikato's Online Machine Learning Research Group in 2021. By that time, Heitor Murilo Gomes, Jacob Montiel, and professors Bernhard Pfahringer and Albert Bifet invited me to give a brief virtual presentation of my ongoing research to fellow researchers. These slides can be seen as a companion to my [paper](https://www.sciencedirect.com/science/article/pii/S0167865521000520) about that subject.
 - [Online machine learning introduction](../extras/online-machine-learning-intro/) I presented to the bioinformatics research group of KU Leuven KULAK. It is basically an updated and trimmed-down version of my original post in Portuguese. It provides a friendly and not mathematically heavy introduction to the research field, with a practical focus on Python and River.
-- My PhD thesis [Thesis](https://www.teses.usp.br/teses/disponiveis/55/55134/tde-30082023-135843/en.php) (defense in May 3, 2023).
+- My PhD [Thesis](https://www.teses.usp.br/teses/disponiveis/55/55134/tde-30082023-135843/en.php) (defense in May 3, 2023).
 
 ## Em Português
 
@@ -23,4 +23,4 @@ Keep an :eye: here, as I will update this page (hopefully) often to add more stu
   - [Introdução a regressão](https://colab.research.google.com/drive/1Js0gYfRVlcDw97TXRYVlXaFibokgfGAg?usp=sharing) :chart_with_upwards_trend:
   - [Árvores de decisão e ensembles baseados em bagging](https://colab.research.google.com/drive/1qGh5eHLIulh-JZGLIudSzzN12SUuu2Wb?usp=sharing) :evergreen_tree:
 - [Introdução a Machine Learning e Ciência de Dados](https://github.com/smastelini/eng-soft-ml-uel): material que desenvolvi para a turma de 2022/2023 do curso de Especialização em Engenharia de Software da Universidade Estadual de Londrina (UEL), para a disciplina que ministrei nesse curso.
-- [Slides](../static/pdf/mastelini_slides_ctd24.pdf) que apresentei no 37º Concurso de Teses e Dissertações da Sociedade Brasileira de Computação (SBC), realizado durante o Congresso da Sociedade Brasilieira de Computação (CSBC), entre os dias 21 e 25 de Julho de 2024. Na ocasião, eu tive a honra de ganhar o prêmio de melhor tese de doutorado do concurso! O [resumo extendido](https://sol.sbc.org.br/index.php/ctd/article/view/29265) submetido ao concurso também está disponível.
+- [Slides](/pdf/mastelini_slides_ctd24.pdf) que apresentei no 37º Concurso de Teses e Dissertações da Sociedade Brasileira de Computação (SBC), realizado durante o Congresso da Sociedade Brasilieira de Computação (CSBC), entre os dias 21 e 25 de Julho de 2024. Na ocasião, eu tive a honra de ganhar o prêmio de melhor tese de doutorado do concurso! O [resumo extendido](https://sol.sbc.org.br/index.php/ctd/article/view/29265) submetido ao concurso também está disponível.
