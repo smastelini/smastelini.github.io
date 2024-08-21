@@ -4,7 +4,7 @@ draft: false
 type: "page"
 ---
 
-Here I share some (possibly) useful resources I prepared here and there throughout my career :nerd:. They are mostly related to courses and classes I have ministred in the past years, as well as presentations I did. I hope they are useful! :rocket:
+Here I share some (possibly) useful resources I prepared here and there throughout my career. They are mostly related to courses and classes I have ministred in the past years, as well as presentations I did. I hope they are useful! :rocket:
 
 Keep an :eye: here, as I will update this page (hopefully) often to add more stuff!
 
